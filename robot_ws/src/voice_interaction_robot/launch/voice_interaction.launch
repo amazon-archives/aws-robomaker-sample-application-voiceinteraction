@@ -1,0 +1,37 @@
+<launch>
+  <!-- 
+       Using simulation time means nodes initialized after this
+       will not use the system clock for its ROS clock and 
+       instead wait for simulation ticks. 
+
+       See http://wiki.ros.org/Clock
+
+       Note: set to false for deploying to a real robot.
+  -->
+  <arg name="use_sim_time" default="true"/>
+  <param name="use_sim_time" value="$(arg use_sim_time)"/>
+
+  <node name="lex_node" pkg="lex_node" type="lex_node" output="screen">
+    <rosparam command="load" file="$(find voice_interaction_robot)/config/lex_config.yaml"/>
+  </node>
+
+  <!-- Launch Polly if enabled -->
+  <arg name="use_polly" default="false"/>
+  <group if="$(arg use_polly)">
+    <include file="$(find tts)/launch/tts_polly.launch"/>
+  </group>
+
+  <remap from="/voice_interaction_node/text_output" to="/text_output" />
+  <remap from="/voice_interaction_node/audio_output" to="/audio_output" />
+  <node pkg="voice_interaction_robot" type="voice_interaction" name="voice_interaction" output="screen"/>
+
+  <arg name="use_microphone" default="false"/>
+  <group if="$(arg use_microphone)">
+    <remap from="/voice_input_node/audio_input" to="/audio_input" />
+    <node pkg="voice_interaction_robot" type="voice_input" name="voice_input" output="screen"/>
+  </group>
+
+  <node pkg="voice_interaction_robot" type="voice_command_translator" name="voice_command_translator" output="screen"/>
+  <node pkg="voice_interaction_robot" type="voice_output" name="voice_output" output="screen"/>
+  <node pkg="voice_interaction_robot" type="audio_output" name="audio_output" output="screen"/>
+</launch>

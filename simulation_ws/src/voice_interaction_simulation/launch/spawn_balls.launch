@@ -1,0 +1,25 @@
+<launch>
+  
+    <node pkg="gazebo_ros" name="spawn_soccer_ball_0" type="spawn_model" args="-database robocup_3Dsim_ball -sdf -model soccer_ball_0 -x -3.0 -y 5.5 -z 0.3"/>
+  
+    <node pkg="gazebo_ros" name="spawn_soccer_ball_1" type="spawn_model" args="-database robocup_3Dsim_ball -sdf -model soccer_ball_1 -x -2.7 -y 5.5 -z 0.3"/>
+  
+    <node pkg="gazebo_ros" name="spawn_soccer_ball_2" type="spawn_model" args="-database robocup_3Dsim_ball -sdf -model soccer_ball_2 -x -2.4 -y 5.5 -z 0.3"/>
+  
+    <node pkg="gazebo_ros" name="spawn_soccer_ball_3" type="spawn_model" args="-database robocup_3Dsim_ball -sdf -model soccer_ball_3 -x -2.1 -y 5.5 -z 0.3"/>
+  
+    <node pkg="gazebo_ros" name="spawn_soccer_ball_4" type="spawn_model" args="-database robocup_3Dsim_ball -sdf -model soccer_ball_4 -x -1.8 -y 5.5 -z 0.3"/>
+  
+    <node pkg="gazebo_ros" name="spawn_soccer_ball_5" type="spawn_model" args="-database robocup_3Dsim_ball -sdf -model soccer_ball_5 -x -1.5 -y 5.5 -z 0.3"/>
+  
+    <node pkg="gazebo_ros" name="spawn_soccer_ball_6" type="spawn_model" args="-database robocup_3Dsim_ball -sdf -model soccer_ball_6 -x -1.2000000000000002 -y 5.5 -z 0.3"/>
+  
+    <node pkg="gazebo_ros" name="spawn_soccer_ball_7" type="spawn_model" args="-database robocup_3Dsim_ball -sdf -model soccer_ball_7 -x -0.8999999999999999 -y 5.5 -z 0.3"/>
+  
+    <node pkg="gazebo_ros" name="spawn_soccer_ball_8" type="spawn_model" args="-database robocup_3Dsim_ball -sdf -model soccer_ball_8 -x -0.6000000000000001 -y 5.5 -z 0.3"/>
+  
+    <node pkg="gazebo_ros" name="spawn_soccer_ball_9" type="spawn_model" args="-database robocup_3Dsim_ball -sdf -model soccer_ball_9 -x -0.30000000000000027 -y 5.5 -z 0.3"/>
+  
+    <node pkg="gazebo_ros" name="spawn_soccer_ball_10" type="spawn_model" args="-database robocup_3Dsim_ball -sdf -model soccer_ball_10 -x 0.0 -y 5.5 -z 0.3"/>
+  
+</launch>
