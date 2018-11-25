@@ -1,0 +1,244 @@
+{
+  "metadata": {
+    "schemaVersion": "1.0",
+    "importType": "LEX",
+    "importFormat": "JSON"
+  },
+  "resource": {
+    "name": "VoiceInteractionRobot",
+    "version": "1",
+    "intents": [
+      {
+        "name": "move",
+        "version": "1",
+        "fulfillmentActivity": {
+          "type": "ReturnIntent"
+        },
+        "sampleUtterances": [
+          "move",
+          "move {move_direction} ",
+          "move {move_direction} {move_rate}",
+          "go",
+          "go {move_direction}",
+          "go {move_direction} {move_rate}"
+        ],
+        "slots": [
+          {
+            "name": "move_direction",
+            "slotConstraint": "Required",
+            "slotType": "MoveDirection",
+            "slotTypeVersion": "1",
+            "valueElicitationPrompt": {
+              "messages": [
+                {
+                  "contentType": "PlainText",
+                  "content": "What direction?"
+                }
+              ],
+              "maxAttempts": 2
+            },
+            "priority": 1,
+            "sampleUtterances": []
+          },
+          {
+            "name": "move_rate",
+            "slotConstraint": "Required",
+            "slotType": "AMAZON.NUMBER",
+            "valueElicitationPrompt": {
+              "messages": [
+                {
+                  "contentType": "PlainText",
+                  "content": "How fast?"
+                }
+              ],
+              "maxAttempts": 2
+            },
+            "priority": 2,
+            "sampleUtterances": []
+          }
+        ],
+        "conclusionStatement": {
+          "messages": [
+            {
+              "contentType": "PlainText",
+              "content": "Moving {move_direction} at {move_rate} m/s",
+              "groupNumber": 1
+            }
+          ]
+        }
+      },
+      {
+        "name": "hello",
+        "version": "1",
+        "fulfillmentActivity": {
+          "type": "ReturnIntent"
+        },
+        "sampleUtterances": [
+          "turtlebot",
+          "turtle bot",
+          "jarvis"
+        ],
+        "slots": [],
+        "conclusionStatement": {
+          "messages": [
+            {
+              "contentType": "PlainText",
+              "content": "Hello!",
+              "groupNumber": 1
+            }
+          ]
+        }
+      },
+      {
+        "name": "stop",
+        "version": "1",
+        "fulfillmentActivity": {
+          "type": "ReturnIntent"
+        },
+        "sampleUtterances": [
+          "stop",
+          "halt",
+          "freeze"
+        ],
+        "slots": [],
+        "conclusionStatement": {
+          "messages": [
+            {
+              "contentType": "PlainText",
+              "content": "Stopping",
+              "groupNumber": 1
+            }
+          ]
+        }
+      },
+      {
+        "name": "turn",
+        "version": "1",
+        "fulfillmentActivity": {
+          "type": "ReturnIntent"
+        },
+        "sampleUtterances": [
+          "turn",
+          "turn {turn_direction}",
+          "turn {turn_direction} {turn_rate}",
+          "rotate",
+          "rotate {turn_direction}",
+          "rotate {turn_direction} {turn_rate}",
+          "spin",
+          "spin {turn_direction}",
+          "spin {turn_direction} {turn_rate}"
+        ],
+        "slots": [
+          {
+            "name": "turn_direction",
+            "slotConstraint": "Required",
+            "slotType": "TurnDirection",
+            "slotTypeVersion": "3",
+            "valueElicitationPrompt": {
+              "messages": [
+                {
+                  "contentType": "PlainText",
+                  "content": "What direction?"
+                }
+              ],
+              "maxAttempts": 2
+            },
+            "priority": 1,
+            "sampleUtterances": []
+          },
+          {
+            "name": "turn_rate",
+            "slotConstraint": "Required",
+            "slotType": "AMAZON.NUMBER",
+            "valueElicitationPrompt": {
+              "messages": [
+                {
+                  "contentType": "PlainText",
+                  "content": "How fast?"
+                }
+              ],
+              "maxAttempts": 2
+            },
+            "priority": 2,
+            "sampleUtterances": []
+          }
+        ],
+        "conclusionStatement": {
+          "messages": [
+            {
+              "contentType": "PlainText",
+              "content": "Turning {turn_direction} at {turn_rate} rad/s",
+              "groupNumber": 1
+            }
+          ]
+        }
+      }
+    ],
+    "slotTypes": [
+      {
+        "description": "Directions the robot can turn",
+        "name": "TurnDirection",
+        "version": "1",
+        "enumerationValues": [
+          {
+            "value": "clockwise",
+            "synonyms": [
+              "clock wise",
+              "right"
+            ]
+          },
+          {
+            "value": "counterclockwise",
+            "synonyms": [
+              "counter clockwise",
+              "counter clock wise",
+              "left"
+            ]
+          }
+        ],
+        "valueSelectionStrategy": "TOP_RESOLUTION"
+      },
+      {
+        "name": "MoveDirection",
+        "version": "1",
+        "enumerationValues": [
+          {
+            "value": "forward",
+            "synonyms": [
+              "ahead",
+              "forwards"
+            ]
+          },
+          {
+            "value": "backward",
+            "synonyms": [
+              "backwards"
+            ]
+          }
+        ],
+        "valueSelectionStrategy": "TOP_RESOLUTION"
+      }
+    ],
+    "voiceId": "Joey",
+    "childDirected": false,
+    "locale": "en-US",
+    "idleSessionTTLInSeconds": 300,
+    "clarificationPrompt": {
+      "messages": [
+        {
+          "contentType": "PlainText",
+          "content": "Sorry, can you please repeat that?"
+        }
+      ],
+      "maxAttempts": 5
+    },
+    "abortStatement": {
+      "messages": [
+        {
+          "contentType": "PlainText",
+          "content": "Sorry, I could not understand. Goodbye."
+        }
+      ]
+    }
+  }
+}

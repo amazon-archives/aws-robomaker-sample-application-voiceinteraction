@@ -1,0 +1,8 @@
+# kinetic.rosinstall
+- setup-file: {local-name: /opt/ros/kinetic/setup.sh}
+
+# Amazon ROS CloudServiceIntegration package dependencies (replace with github and/or ROS <depend> packages)
+- git: {local-name: src/deps/aws-ros-utils-common, uri: 'ssh://github.com/aws-robotics/aws-ros-utils-common', version: mainline}
+- git: {local-name: src/deps/aws-ros-utils-ros1, uri: 'ssh://github.com/aws-robotics/aws-ros-utils-ros1', version: mainline}
+- git: {local-name: src/deps/lex-ros1, uri: 'ssh://github.com/aws-robotics/lex-ros1', version: mainline}
+- git: {local-name: src/deps/tts-ros1, uri: 'ssh://github.com/aws-robotics/tts-ros1', version: mainline}

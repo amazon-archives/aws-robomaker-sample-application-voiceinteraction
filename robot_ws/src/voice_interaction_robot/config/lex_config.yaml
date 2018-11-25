@@ -1,0 +1,12 @@
+aws_client_configuration:
+  region: "us-west-2"
+  connect_timeout_ms: 9000
+  request_timeout_ms: 9000
+
+lex_configuration:
+  # Unique per robot, signifies "who" is communicating with lex
+  user_id: "voice_interaction_example"
+  # The Lex Bot Name as seen on the lex console
+  bot_name: "VoiceInteractionRobot"
+  # The Lex Bot Alias as published
+  bot_alias: "VoiceInteractionRobotSample"
