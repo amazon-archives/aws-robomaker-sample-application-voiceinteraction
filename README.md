@@ -1,6 +1,6 @@
-# AWS RoboMaker Sample Application - Voice Interacton
+# AWS RoboMaker Sample Application - Voice Interaction
 
-This Sample Application demonstrates a robot that has voice controls via Amazon Lex, 
+This sample application demonstrates a robot that has voice controls via Amazon Lex, 
 and can speak up if it encounters trouble using Amazon Polly.
 
 Keywords: Robot Voice Interaction, AWS, Lex, Polly
@@ -77,7 +77,7 @@ colcon build
 First, you must create a LexBot by importing the JSON file `robot_ws/src/voice_interaction_robot/config/VoiceInteractionRobot.json` into Lex.  
 You can read detailed instructions on how to import [here](https://docs.aws.amazon.com/lex/latest/dg/import-from-lex.html).
 
-After the import is complete you must Build the bot, and then publish it to an alias. 
+After the import is complete you must build the bot, and then publish it to an alias. 
 
 Once the bot has been built and published to an alias, edit the file `robot_ws/src/voice_interaction_robot/config/lex_config.yaml` 
 changing the bot_name and bot_alias variables to the bot you published in the Lex console. 
@@ -289,7 +289,7 @@ rosrun voice_interaction_robot audio_input.py
 /voice_output
 ```
 
-## ROS Topics used by this Sample
+## ROS topics used by this sample
 
 ```
 /clock
@@ -314,6 +314,6 @@ MIT-0 - See LICENSE.txt for further information
 
 ## How to Contribute
 
-Create issues and pull requests against this Repository on Github
+Create issues and pull requests against this repository on Github
 
 
