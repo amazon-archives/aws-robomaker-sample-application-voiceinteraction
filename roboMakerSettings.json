@@ -79,7 +79,12 @@
           "outputLocation": "<bucket name for job outputs>",
           "failureBehavior": "Fail",
           "maxJobDurationInSeconds": 28800,
-          "iamRole": "<your B9 role ARN>"
+          "iamRole": "<your RoboMaker simulation job role ARN>",
+          "vpcConfig": {
+            "assignPublicIp": true,
+            "securityGroups": [ "<security group id>" ],
+            "subnets": [ "<subnet id>" ]
+          }
         }
       }
     },
