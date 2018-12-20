@@ -8,11 +8,16 @@
 
        Note: set to false for deploying to a real robot.
   -->
+
+  <!-- Optional AWS region, if empty uses the config defaults -->
+  <arg name="aws_region" value="$(optenv ROS_AWS_REGION)" doc="AWS region override, defaults to config .yaml if unset"/>
+
   <arg name="use_sim_time" default="true"/>
   <param name="use_sim_time" value="$(arg use_sim_time)"/>
 
   <node name="lex_node" pkg="lex_node" type="lex_node" output="screen">
     <rosparam command="load" file="$(find voice_interaction_robot)/config/lex_config.yaml"/>
+    <rosparam if="$(eval aws_region != '')" param="aws_client_configuration/region" subst_value="true">$(arg aws_region)</rosparam>
   </node>
 
   <!-- Launch Polly if enabled -->
