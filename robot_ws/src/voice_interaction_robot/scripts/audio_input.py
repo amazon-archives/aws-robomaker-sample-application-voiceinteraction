@@ -25,6 +25,7 @@
 """
 
 import rospy
+import rospkg
 from audio_common_msgs.msg import AudioData
 from std_msgs.msg import String
 import numpy as np
@@ -33,7 +34,7 @@ import time
 import threading
 
 WAV_HEADER_LENGTH = 24
-DEFAULT_ASSETS_DIR = os.path.relpath(os.path.dirname(os.path.realpath(__file__)) + "/../assets/")
+DEFAULT_ASSETS_DIR = rospkg.RosPack().get_path('voice_interaction_robot') + "/assets"
 DEFAULT_ASSETS_EXT = ".wav"
 
 audio_input_publisher = rospy.Publisher("/audio_input", AudioData, queue_size=5)
