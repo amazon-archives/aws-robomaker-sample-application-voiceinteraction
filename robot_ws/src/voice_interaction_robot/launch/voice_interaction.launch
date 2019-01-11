@@ -18,11 +18,13 @@
   <arg name="use_sim_time" default="true"/>
   <param name="use_sim_time" value="$(arg use_sim_time)"/>
 
+  <arg name="lex_node_name" value="lex_node"/>
   <include file="$(find lex_node)/launch/lex_node.launch">
     <arg name="config_file" value="$(find voice_interaction_robot)/config/lex_config.yaml"/>
+    <arg name="node_name" value="$(arg lex_node_name)"/>
     <arg name="output" value="$(arg output)"/>
   </include>
-  <rosparam if="$(eval aws_region != '')" param="lex_node/aws_client_configuration/region" subst_value="true">$(arg aws_region)</rosparam>
+  <rosparam if="$(eval aws_region != '')" param="/$(arg lex_node_name)/aws_client_configuration/region" subst_value="true">$(arg aws_region)</rosparam>
 
   <!-- Launch Polly if enabled -->
   <arg name="use_polly" default="false"/>
