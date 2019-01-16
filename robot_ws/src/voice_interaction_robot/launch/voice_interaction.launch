@@ -11,14 +11,20 @@
 
   <!-- Optional AWS region, if empty uses the config defaults -->
   <arg name="aws_region" value="$(optenv ROS_AWS_REGION)" doc="AWS region override, defaults to config .yaml if unset"/>
+  
+  <!-- Default ROS output location, set this to 'log' to write stdout to a log file instead of the screen -->
+  <arg name="output" default="screen" doc="ROS stdout output location"/>
 
   <arg name="use_sim_time" default="true"/>
   <param name="use_sim_time" value="$(arg use_sim_time)"/>
 
-  <node name="lex_node" pkg="lex_node" type="lex_node" output="screen">
-    <rosparam command="load" file="$(find voice_interaction_robot)/config/lex_config.yaml"/>
-    <rosparam if="$(eval aws_region != '')" param="aws_client_configuration/region" subst_value="true">$(arg aws_region)</rosparam>
-  </node>
+  <arg name="lex_node_name" value="lex_node"/>
+  <include file="$(find lex_node)/launch/lex_node.launch">
+    <arg name="config_file" value="$(find voice_interaction_robot)/config/lex_config.yaml"/>
+    <arg name="node_name" value="$(arg lex_node_name)"/>
+    <arg name="output" value="$(arg output)"/>
+  </include>
+  <rosparam if="$(eval aws_region != '')" param="/$(arg lex_node_name)/aws_client_configuration/region" subst_value="true">$(arg aws_region)</rosparam>
 
   <!-- Launch Polly if enabled -->
   <arg name="use_polly" default="false"/>
@@ -28,15 +34,15 @@
 
   <remap from="/voice_interaction_node/text_output" to="/text_output" />
   <remap from="/voice_interaction_node/audio_output" to="/audio_output" />
-  <node pkg="voice_interaction_robot" type="voice_interaction" name="voice_interaction" output="screen"/>
+  <node pkg="voice_interaction_robot" type="voice_interaction" name="voice_interaction" output="$(arg output)"/>
 
   <arg name="use_microphone" default="false"/>
   <group if="$(arg use_microphone)">
     <remap from="/voice_input_node/audio_input" to="/audio_input" />
-    <node pkg="voice_interaction_robot" type="voice_input" name="voice_input" output="screen"/>
+    <node pkg="voice_interaction_robot" type="voice_input" name="voice_input" output="$(arg output)"/>
   </group>
 
-  <node pkg="voice_interaction_robot" type="voice_command_translator" name="voice_command_translator" output="screen"/>
-  <node pkg="voice_interaction_robot" type="voice_output" name="voice_output" output="screen"/>
-  <node pkg="voice_interaction_robot" type="audio_output" name="audio_output" output="screen"/>
+  <node pkg="voice_interaction_robot" type="voice_command_translator" name="voice_command_translator" output="$(arg output)"/>
+  <node pkg="voice_interaction_robot" type="voice_output" name="voice_output" output="$(arg output)"/>
+  <node pkg="voice_interaction_robot" type="audio_output" name="audio_output" output="$(arg output)"/>
 </launch>
