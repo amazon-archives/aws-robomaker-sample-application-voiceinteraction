@@ -56,7 +56,7 @@ class VoiceInteraction:
     def __init__(self, node_name, text_input_topic, audio_input_topic, wake_word_topic,
                  text_output_topic, audio_output_topic, fulfilled_command_topic):
         self.ww = WakeWord()
-        rospy.init_node(node_name)
+        rospy.init_node(node_name, disable_signals=True)
         rospy.loginfo("Initialized node %s" % node_name)
         rospy.Subscriber(text_input_topic, String, self.handle_text_input)
         rospy.Subscriber(audio_input_topic, AudioData, self.handle_audio_input)
@@ -75,6 +75,7 @@ class VoiceInteraction:
             return None
 
         user_input = request.data
+        rospy.loginfo("Received text input {}".format(user_input))
         empty_audio_request = AudioData(data='')
         lex_response = lex_service(content_type='text/plain; charset=utf-8',
                                    accept_type='text/plain; charset=utf-8',

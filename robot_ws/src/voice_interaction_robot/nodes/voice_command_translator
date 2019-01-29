@@ -26,7 +26,6 @@ from geometry_msgs.msg import Twist
 
 cmd_vel_publisher = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
 
-
 class VoiceCommandTranslator:
     slots = []
 
@@ -38,8 +37,8 @@ class VoiceCommandTranslator:
         rospy.spin()
 
     def handle_voice_command(self, command):
-        rospy.loginfo("Fulfilled lex command:")
-        rospy.loginfo(command)
+        rospy.logdebug("Fulfilled lex command:")
+        rospy.logdebug(command)
         response_handlers = {
             'hello': self.ignore,
             'move': self.move_handler,
@@ -60,13 +59,11 @@ class VoiceCommandTranslator:
 
     def stop_handler(self):
         stop_command = Twist()
-        cmd_vel_publisher.publish(stop_command)
+        self.publish_command(stop_command)
         
     def move_handler(self):
         move_command = self.convert_response_to_move_command()
-        rospy.loginfo("move command:")
-        rospy.loginfo(move_command)
-        cmd_vel_publisher.publish(move_command)
+        self.publish_command(move_command)
         
     def convert_response_to_move_command(self):
         twist = Twist()
@@ -77,9 +74,7 @@ class VoiceCommandTranslator:
         
     def turn_handler(self):
         turn_command = self.convert_response_to_turn_command()
-        rospy.loginfo("turn command:")
-        rospy.loginfo(turn_command)
-        cmd_vel_publisher.publish(turn_command)
+        self.publish_command(turn_command)
         
     def convert_response_to_turn_command(self):
         twist = Twist()
@@ -87,6 +82,11 @@ class VoiceCommandTranslator:
         if self.slots['turn_direction'].startswith("clock"):
             twist.angular.z *= -1
         return twist
+        
+    def publish_command(self, cmd_vel_command):
+        rospy.logdebug("publishing the following to /cmd_vel:")
+        rospy.logdebug(cmd_vel_command)
+        cmd_vel_publisher.publish(cmd_vel_command)
 
 
 def main():

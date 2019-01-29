@@ -1,0 +1,11 @@
+<launch>
+  <include file="$(find voice_interaction_robot)/launch/voice_interaction.launch">
+    <arg name="use_sim_time" value="true" />
+    <arg name="use_polly" value="false" />
+    <arg name="use_microphone" value="false" />
+    <arg name="use_speaker" value="false" />
+    <arg name="output" value="log"/>
+  </include>
+  
+  <node pkg="voice_interaction_robot" type="integration_test"  name="integration_test" output="screen" />
+</launch>

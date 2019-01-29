@@ -7,5 +7,7 @@
     <arg name="use_sim_time" value="false" />
     <arg name="use_polly" value="true" />
     <arg name="use_microphone" value="true" />
+    <arg name="use_speaker" value="true" />
+    <arg name="output" value="log" />
   </include>
 </launch>

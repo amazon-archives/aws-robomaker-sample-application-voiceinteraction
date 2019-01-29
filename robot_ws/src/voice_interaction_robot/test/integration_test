@@ -1,0 +1,123 @@
+#!/usr/bin/env python
+"""
+ Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ software and associated documentation files (the "Software"), to deal in the Software
+ without restriction, including without limitation the rights to use, copy, modify,
+ merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+ permit persons to whom the Software is furnished to do so.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+ PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+"""
+
+
+"""
+    This script runs a series of integration tests for the voice_interaction node. 
+    It can be launched with the integration_test launch file and it will output
+    how many tests are to be run and the results for each test. 
+"""
+
+import rospy
+import rosnode
+import rostopic
+import rosservice
+import time
+from std_msgs.msg import String
+from geometry_msgs.msg import Twist, Vector3
+
+
+class VoiceInteractionIntegrationTest:
+    wake_words = ("jarvis", "turtlebot")
+    last_cmd_vel = None
+    vinode_start_timeout = 10
+    
+    def __init__(self, test_sleep_time=1):
+        rospy.init_node("integration_test", disable_signals=True)
+        self.text_input_publisher = rospy.Publisher("/text_input", String, queue_size=5)
+        self.wake_publisher = rospy.Publisher("/wake_word", String, queue_size=5)
+        rospy.Subscriber("/cmd_vel", Twist, self.save_cmd_vel)
+        self.test_sleep_time = test_sleep_time
+        
+    def run_tests(self):
+        self.wait_for_voice_interaction_nodes()
+        self.wait_for_voice_interaction_services()
+        self.wait_for_voice_interaction_node_to_subscribe_to_topic()
+        self.run_text_input_tests()
+        
+    def wait_for_voice_interaction_nodes(self):
+        required_nodes = set([
+            '/lex_node', 
+            '/voice_interaction', 
+            '/voice_command_translator'
+        ])
+        while not required_nodes.issubset(rosnode.get_node_names()):
+            time.sleep(0.1)
+            
+    def wait_for_voice_interaction_services(self):
+        required_services = set([
+            '/lex_node/lex_conversation'
+        ])
+        while not required_services.issubset(rosservice.get_service_list()):
+            time.sleep(0.1)
+            
+    def wait_for_voice_interaction_node_to_subscribe_to_topic(self):
+        rostopic.wait_for_subscriber(self.text_input_publisher, self.vinode_start_timeout)
+        rostopic.wait_for_subscriber(self.wake_publisher, self.vinode_start_timeout)
+            
+    def run_text_input_tests(self):
+        text_input_tests = [
+            (["move", "forward", "5"], Twist(Vector3(5,0,0), Vector3(0,0,0))),
+            (["move", "backwards", "0.2"], Twist(Vector3(-0.2,0,0), Vector3(0,0,0))),
+            (["move forward 2"], Twist(Vector3(2,0,0), Vector3(0,0,0))),
+            (["rotate left 10"], Twist(Vector3(0,0,0), Vector3(0,0,10))),
+            (["rotate", "clockwise",  "5"], Twist(Vector3(0,0,0), Vector3(0,0,-5))),
+            (["stop"], Twist(Vector3(0,0,0), Vector3(0,0,0))),
+            (["halt"], Twist(Vector3(0,0,0), Vector3(0,0,0)))
+        ]
+        rospy.loginfo("Total tests: {}".format(len(text_input_tests)))
+        for text_input_test in text_input_tests:
+            self.run_text_input_test(text_input_test)
+            
+    def run_text_input_test(self, test):
+        (commands, expected_result) = test
+        self.wake_robot()
+        for command in commands:
+            self.send_text(command)
+        time.sleep(self.test_sleep_time)
+        self.check_result(self.last_cmd_vel, expected_result)
+        
+    def check_result(self, result, expected_result):
+        if result == expected_result:
+            rospy.loginfo("test passed")
+            return
+        
+        rospy.loginfo("test failed")
+        rospy.loginfo("result: {}".format(self.last_cmd_vel))
+        rospy.loginfo("expected result: {}".format(expected_result))
+        
+        
+    def wake_robot(self):
+        self.wake_publisher.publish(self.wake_words[0])
+        time.sleep(0.1)
+        
+    def send_text(self, text):
+        self.text_input_publisher.publish(text)
+
+    def save_cmd_vel(self, data):
+        self.last_cmd_vel = data
+
+def main():
+    vi_integration_test = VoiceInteractionIntegrationTest()
+    rospy.loginfo("Starting integration tests")
+    vi_integration_test.run_tests()
+    rospy.loginfo("Integration tests complete")
+
+
+if __name__ == "__main__":
+    main()

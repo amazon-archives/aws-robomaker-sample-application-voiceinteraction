@@ -35,6 +35,7 @@
   <remap from="/voice_interaction_node/text_output" to="/text_output" />
   <remap from="/voice_interaction_node/audio_output" to="/audio_output" />
   <node pkg="voice_interaction_robot" type="voice_interaction" name="voice_interaction" output="$(arg output)"/>
+  <node pkg="voice_interaction_robot" type="voice_command_translator" name="voice_command_translator" output="$(arg output)"/>
 
   <arg name="use_microphone" default="false"/>
   <group if="$(arg use_microphone)">
@@ -42,7 +43,9 @@
     <node pkg="voice_interaction_robot" type="voice_input" name="voice_input" output="$(arg output)"/>
   </group>
 
-  <node pkg="voice_interaction_robot" type="voice_command_translator" name="voice_command_translator" output="$(arg output)"/>
-  <node pkg="voice_interaction_robot" type="voice_output" name="voice_output" output="$(arg output)"/>
-  <node pkg="voice_interaction_robot" type="audio_output" name="audio_output" output="$(arg output)"/>
+  <arg name="use_speaker" default="false"/>
+  <group if="$(arg use_speaker)">
+    <node pkg="voice_interaction_robot" type="voice_output" name="voice_output" output="$(arg output)"/>
+    <node pkg="voice_interaction_robot" type="audio_output" name="audio_output" output="$(arg output)"/>
+  </group>
 </launch>

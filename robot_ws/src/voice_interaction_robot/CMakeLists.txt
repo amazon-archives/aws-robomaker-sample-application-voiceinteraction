@@ -65,6 +65,7 @@ catkin_install_python(PROGRAMS
   nodes/voice_command_translator
   scripts/text_input.py
   scripts/audio_input.py
+  test/integration_test
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
