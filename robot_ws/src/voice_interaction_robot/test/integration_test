@@ -24,22 +24,82 @@
 """
 
 import rospy
+import rospkg
 import rosnode
 import rostopic
 import rosservice
 import time
+import os
+import numpy as np
 from std_msgs.msg import String
 from geometry_msgs.msg import Twist, Vector3
+from audio_common_msgs.msg import AudioData
 
+WAV_HEADER_LENGTH = 24
+AUDIO_ASSETS_DIR = rospkg.RosPack().get_path('voice_interaction_robot') + "/assets"
+AUDIO_EXTENSION = ".wav"
 
+class IntegrationTest:
+    wait_between_audio_commands = 1
+    
+    def __init__(self, text_input_publisher, audio_input_publisher, test_type, commands, expected_result):
+        self.text_input_publisher = text_input_publisher
+        self.audio_input_publisher = audio_input_publisher
+        self.test_type = test_type
+        self.commands = commands
+        self.expected_result = expected_result
+        
+    def run_test(self):
+        test_runners = {
+            'text': self.run_text_input_test,
+            'audio': self.run_audio_input_test
+        }
+        test_runners[self.test_type]()
+        
+    def run_text_input_test(self):
+        for command in self.commands:
+            self.send_text(command)
+            
+    def send_text(self, text):
+        self.text_input_publisher.publish(text)
+        
+    def run_audio_input_test(self):
+        for filename in self.commands:
+            self.send_audio(filename)
+            time.sleep(self.wait_between_audio_commands)
+        
+    def send_audio(self, filename):
+        full_path = AUDIO_ASSETS_DIR + "/" + filename + AUDIO_EXTENSION
+        raw_data = self.load_wav_file(full_path)
+        if raw_data is not None:
+            audio_data = raw_data.tolist() 
+            self.audio_input_publisher.publish(audio_data)
+
+    def load_wav_file(self, filepath):
+        if not os.path.exists(filepath):
+            print("Could not find file " + filepath)
+            return None
+        data = np.fromfile(open(filepath), np.uint8)[WAV_HEADER_LENGTH:]
+        return data
+
+    def check_result(self, result):
+        if result == self.expected_result:
+            rospy.loginfo("test passed")
+            return
+        rospy.loginfo("test failed")
+        rospy.loginfo("result: {}".format(result))
+        rospy.loginfo("expected result: {}".format(self.expected_result))
+        
 class VoiceInteractionIntegrationTest:
     wake_words = ("jarvis", "turtlebot")
     last_cmd_vel = None
     vinode_start_timeout = 10
+    tests = []
     
     def __init__(self, test_sleep_time=1):
         rospy.init_node("integration_test", disable_signals=True)
         self.text_input_publisher = rospy.Publisher("/text_input", String, queue_size=5)
+        self.audio_input_publisher = rospy.Publisher("/audio_input", AudioData, queue_size=5)
         self.wake_publisher = rospy.Publisher("/wake_word", String, queue_size=5)
         rospy.Subscriber("/cmd_vel", Twist, self.save_cmd_vel)
         self.test_sleep_time = test_sleep_time
@@ -48,7 +108,17 @@ class VoiceInteractionIntegrationTest:
         self.wait_for_voice_interaction_nodes()
         self.wait_for_voice_interaction_services()
         self.wait_for_voice_interaction_node_to_subscribe_to_topic()
-        self.run_text_input_tests()
+        self.load_text_input_tests()
+        self.load_audio_input_tests()
+        rospy.loginfo("Total tests: {}".format(len(self.tests)))
+        for test in self.tests:
+            self.run_test(test)
+        
+    def run_test(self, test):
+        self.wake_robot()
+        test.run_test()
+        time.sleep(self.test_sleep_time)
+        test.check_result(self.last_cmd_vel)
         
     def wait_for_voice_interaction_nodes(self):
         required_nodes = set([
@@ -70,7 +140,7 @@ class VoiceInteractionIntegrationTest:
         rostopic.wait_for_subscriber(self.text_input_publisher, self.vinode_start_timeout)
         rostopic.wait_for_subscriber(self.wake_publisher, self.vinode_start_timeout)
             
-    def run_text_input_tests(self):
+    def load_text_input_tests(self):
         text_input_tests = [
             (["move", "forward", "5"], Twist(Vector3(5,0,0), Vector3(0,0,0))),
             (["move", "backwards", "0.2"], Twist(Vector3(-0.2,0,0), Vector3(0,0,0))),
@@ -80,35 +150,30 @@ class VoiceInteractionIntegrationTest:
             (["stop"], Twist(Vector3(0,0,0), Vector3(0,0,0))),
             (["halt"], Twist(Vector3(0,0,0), Vector3(0,0,0)))
         ]
-        rospy.loginfo("Total tests: {}".format(len(text_input_tests)))
-        for text_input_test in text_input_tests:
-            self.run_text_input_test(text_input_test)
+        for test in text_input_tests:
+            (command, expected_result) = test
+            integration_test = IntegrationTest(self.text_input_publisher, self.audio_input_publisher, 
+                "text", command, expected_result)
+            self.tests.append(integration_test)
+        
+    def load_audio_input_tests(self):
+        audio_input_tests = [
+            (["move-forward-5"], Twist(Vector3(5,0,0), Vector3(0,0,0))),
+            (["turn-clockwise-3"], Twist(Vector3(0,0,0), Vector3(0,0,-3))),
+            (["stop"], Twist(Vector3(0,0,0), Vector3(0,0,0))),
+            (["turn", "counterclockwise", "10"], Twist(Vector3(0,0,0), Vector3(0,0,10))),
+            (["rotate", "clockwise", "5"], Twist(Vector3(0,0,0), Vector3(0,0,-5))),
+        ]
+        for test in audio_input_tests:
+            (command, expected_result) = test
+            integration_test = IntegrationTest(self.text_input_publisher, self.audio_input_publisher,
+                "audio", command, expected_result)
+            self.tests.append(integration_test)
             
-    def run_text_input_test(self, test):
-        (commands, expected_result) = test
-        self.wake_robot()
-        for command in commands:
-            self.send_text(command)
-        time.sleep(self.test_sleep_time)
-        self.check_result(self.last_cmd_vel, expected_result)
-        
-    def check_result(self, result, expected_result):
-        if result == expected_result:
-            rospy.loginfo("test passed")
-            return
-        
-        rospy.loginfo("test failed")
-        rospy.loginfo("result: {}".format(self.last_cmd_vel))
-        rospy.loginfo("expected result: {}".format(expected_result))
-        
-        
     def wake_robot(self):
         self.wake_publisher.publish(self.wake_words[0])
         time.sleep(0.1)
         
-    def send_text(self, text):
-        self.text_input_publisher.publish(text)
-
     def save_cmd_vel(self, data):
         self.last_cmd_vel = data
 
