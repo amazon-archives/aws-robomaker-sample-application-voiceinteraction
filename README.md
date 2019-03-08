@@ -252,7 +252,7 @@ scripts to move the robot around. First, open a RoboMaker terminal from the simu
 
 ```bash
 # Initialize ROS environment variables, message types etc
-BUNDLE_CURRENT_PREFIX=~/workspace/robot-application/bundle source ~/workspace/robot-application/bundle/setup.sh
+eval $AWS_ROBOMAKER_ROBOT_APPLICATION_SETUP
 
 # Run Audio Input user terminal
 rosrun voice_interaction_robot text_input.py
