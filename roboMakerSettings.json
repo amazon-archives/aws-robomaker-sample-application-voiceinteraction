@@ -39,7 +39,7 @@
         "robotApp": {
           "name": "RoboMakerVoiceInteractionRobot",
           "s3Bucket": "<bucket name for robot bundle>",
-          "sourceBundleFile": "./VoiceInteraction/robot_ws/bundle/output.tar.gz",
+          "sourceBundleFile": "./VoiceInteraction/robot_ws/bundle/output.tar",
           "architecture": "X86_64",
           "robotSoftwareSuite": {
             "version": "Kinetic",
@@ -53,7 +53,7 @@
         "simulationApp": {
           "name": "RoboMakerVoiceInteractionSimulation",
           "s3Bucket": "<bucket name for simulation bundle>",
-          "sourceBundleFile": "./VoiceInteraction/simulation_ws/bundle/output.tar.gz",
+          "sourceBundleFile": "./VoiceInteraction/simulation_ws/bundle/output.tar",
           "architecture": "X86_64",
           "launchConfig": {
             "packageName": "voice_interaction_simulation",
