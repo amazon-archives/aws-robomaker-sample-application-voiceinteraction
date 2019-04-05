@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>voice_interaction_robot</name>
-  <version>1.1.0</version>
+  <version>1.2.0</version>
   <description>
     AWS RoboMaker robot package provides one basic example for using a Turtlebot3 with Amazon Lex and Amazon Polly
   </description>
