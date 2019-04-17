@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>voice_interaction_simulation</name>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
   <description>
     AWS RoboMaker simulation package for a TurtleBot3 in a retail bookstore world.
   </description>
