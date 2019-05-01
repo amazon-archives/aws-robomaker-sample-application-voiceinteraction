@@ -15,6 +15,9 @@
   <!-- Default ROS output location, set this to 'log' to write stdout to a log file instead of the screen -->
   <arg name="output" default="screen" doc="ROS stdout output location"/>
 
+  <!-- UserID sent when communicating with the Lex Bot, can be any string. Each robot talking to the same Lex Bot should have its own UserID -->
+  <arg name="user_id" value="$(optenv AWS_LEX_USER_ID)" doc="UserID sent when communicating with the Lex Bot, can be any string. Defauls to value in config .yaml if unset"/>
+
   <arg name="use_sim_time" default="true"/>
   <param name="use_sim_time" value="$(arg use_sim_time)"/>
 
@@ -25,6 +28,8 @@
     <arg name="output" value="$(arg output)"/>
   </include>
   <rosparam if="$(eval aws_region != '')" param="/$(arg lex_node_name)/aws_client_configuration/region" subst_value="true">$(arg aws_region)</rosparam>
+  <rosparam if="$(eval user_id != '')" param="/$(arg lex_node_name)/lex_configuration/user_id" subst_value="true">$(arg user_id)</rosparam>
+
 
   <!-- Launch Polly if enabled -->
   <arg name="use_polly" default="false"/>
