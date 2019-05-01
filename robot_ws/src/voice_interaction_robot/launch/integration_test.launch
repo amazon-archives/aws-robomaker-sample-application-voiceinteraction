@@ -1,5 +1,5 @@
 <launch>
-  <arg name="user_id" default="voice_interaction_example" doc="UserID used when communicating with the Lex Bot, can be any string"/>
+  <arg name="user_id" value="$(optenv AWS_LEX_USER_ID voice_interaction_example)" doc="UserID used when communicating with the Lex Bot, can be any string"/>
   <include file="$(find voice_interaction_robot)/launch/voice_interaction.launch">
     <arg name="use_sim_time" value="true" />
     <arg name="use_polly" value="false" />
