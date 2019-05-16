@@ -102,6 +102,13 @@ Launch the application with the following commands:
     roslaunch voice_interaction_simulation bookstore.launch
     ```
 
+### Run Options
+
+You can set the following environment variables to configure your robot:
+
+- `ROS_AWS_REGION` - Set the AWS region of the Lex bot you are connecting to. Defaults to the value of `aws_client_configuration.region` in `config/lex_config.yaml` if unset. 
+- `LEX_USER_ID` - Set the UserID used when talking to the Lex bot. This is useful if you have multiple robots talking to the same Lex bot at the same time, as Lex will error if you send multiple commands using the same UserID to the same Lex bot at the same time. Defaults to the value of `lex_configuration.user_id` in `config/lex_config.yaml` if unset.  
+
 ## Test 
 
 First, run the robot following the commands in the "Run" section. Then try some of the possible ways to test below.
