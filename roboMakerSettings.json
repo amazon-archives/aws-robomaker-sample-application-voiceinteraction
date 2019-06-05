@@ -47,7 +47,7 @@
           },
           "launchConfig": {
             "packageName": "voice_interaction_robot",
-            "launchFile": "await_commands.launch"
+            "launchFile": "voice_interaction.launch"
           }
         },
         "simulationApp": {
@@ -57,9 +57,9 @@
           "architecture": "X86_64",
           "launchConfig": {
             "packageName": "voice_interaction_simulation",
-            "launchFile": "bookstore_turtlebot_navigation.launch",
+            "launchFile": "bookstore.launch",
             "environmentVariables":{
-               "TURTLEBOT3_MODEL":"burger"
+               "TURTLEBOT3_MODEL":"waffle_pi"
             }
           },
           "robotSoftwareSuite":{
