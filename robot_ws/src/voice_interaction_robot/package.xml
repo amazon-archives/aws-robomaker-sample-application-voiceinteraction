@@ -29,4 +29,5 @@
   <exec_depend>message_runtime</exec_depend>
   <exec_depend>turtlebot3_bringup</exec_depend>
   <exec_depend>python-rospkg</exec_depend>
+  <exec_depend>lex_node</exec_depend>
 </package>
