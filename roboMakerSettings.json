@@ -47,7 +47,7 @@
           },
           "launchConfig": {
             "packageName": "voice_interaction_robot",
-            "launchFile": "await_commands.launch"
+            "launchFile": "voice_interaction.launch"
           }
         },
         "simulationApp": {
