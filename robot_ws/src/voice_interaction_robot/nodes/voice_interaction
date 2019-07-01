@@ -24,6 +24,7 @@ from audio_common_msgs.msg import AudioData
 from voice_interaction_robot_msgs.msg import FulfilledVoiceCommand
 
 lex_service = rospy.ServiceProxy("/lex_node/lex_conversation", AudioTextConversation)
+use_polly = rospy.get_param("/voice_interaction/use_polly")
 
 """
  This node does not respond to lex commands until it has been awoken
@@ -88,8 +89,11 @@ class VoiceInteraction:
             return None
 
         audio_data = request.data
+        accept_type = 'text/plain; charset=utf-8'
+        if use_polly:
+            accept_type = 'audio/pcm'
         lex_response = lex_service(content_type='audio/x-l16; sample-rate=16000; channel-count=1',
-                                   accept_type='audio/pcm',
+                                   accept_type=accept_type,
                                    text_request=None,
                                    audio_request=AudioData(data=audio_data))
         self.handle_lex_response(lex_response)

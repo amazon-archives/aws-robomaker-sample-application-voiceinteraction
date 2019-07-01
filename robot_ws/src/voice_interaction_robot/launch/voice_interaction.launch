@@ -39,7 +39,9 @@
 
   <remap from="/voice_interaction_node/text_output" to="/text_output" />
   <remap from="/voice_interaction_node/audio_output" to="/audio_output" />
-  <node pkg="voice_interaction_robot" type="voice_interaction" name="voice_interaction" output="$(arg output)"/>
+  <node pkg="voice_interaction_robot" type="voice_interaction" name="voice_interaction" output="$(arg output)">
+    <param name="use_polly" type="bool" value="$(arg use_polly)"/>
+  </node>
   <node pkg="voice_interaction_robot" type="voice_command_translator" name="voice_command_translator" output="$(arg output)"/>
 
   <arg name="use_microphone" default="false"/>
