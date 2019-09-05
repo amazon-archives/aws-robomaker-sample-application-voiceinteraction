@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>voice_interaction_log_based_simulation</name>
+  <version>1.0.0</version>
+  <description>
+    AWS RoboMaker log based simulation package for using a Turtlebot3 with Amazon Lex and Amazon Polly
+  </description>
+  <license>MIT</license>
+  <author email="ros-contributions@amazon.com">AWS RoboMaker</author>
+  <maintainer email="ros-contributions@amazon.com">AWS RoboMaker</maintainer>
+  <buildtool_depend>catkin</buildtool_depend>
+  <exec_depend>rosbag</exec_depend>
+  <depend>geometry_msgs</depend>
+</package>
