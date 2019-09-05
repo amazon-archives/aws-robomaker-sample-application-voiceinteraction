@@ -3,14 +3,14 @@
 import sys
 import argparse
 import rospy
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Twist, Vector3
 from robomaker_simulation_msgs.msg import Tag
 from robomaker_simulation_msgs.srv import Cancel, AddTags
 
 
 IS_CANCELLED = False
 DEFAULT_BAG_CLOCK_TIMEOUT_SECONDS = 60
-
+X_CMD_VELOCITY = 5
 
 def cancel_job():
     '''
@@ -44,11 +44,11 @@ def has_changed_velocity(cmd_vel):
         return
 
     rospy.loginfo("Test is checking if command velocity has changed.")
-    # if not IS_CANCELLED and recognized_result.data.strip()[:5] == 'I see':
-    rospy.loginfo(
-        "Command velocity changed on the robot, test passed and cancelling job")
-    add_tags([Tag(key="status", value="passed")])
-    cancel_job()
+    if not IS_CANCELLED and cmd_vel.linear.x == X_CMD_VELOCITY:
+        rospy.loginfo(
+            "Command velocity changed on the robot, test passed and cancelling job")
+        add_tags([Tag(key="status", value="passed")])
+        cancel_job()
 
 
 def timeout_test(timeout):
