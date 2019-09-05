@@ -12,11 +12,12 @@ IS_CANCELLED = False
 DEFAULT_BAG_CLOCK_TIMEOUT_SECONDS = 60
 X_CMD_VELOCITY = 5
 
+
 def cancel_job():
-    '''
+    """
         Cancel a job. Use a global shared with other functions as the
         cancellation may take serveral seconds.
-    '''
+    """
     global IS_CANCELLED
     request_cancel = rospy.ServiceProxy('/robomaker/job/cancel', Cancel)
     response = request_cancel()
@@ -28,9 +29,10 @@ def cancel_job():
 
 
 def add_tags(tags):
-    ''' See Tag key and value rules:
-            https://docs.aws.amazon.com/robomaker/latest/dg/API_TagResource.html
-    '''
+    """
+        See Tag key and value rules:
+        https://docs.aws.amazon.com/robomaker/latest/dg/API_TagResource.html
+    """
     request_add_tags = rospy.ServiceProxy('/robomaker/job/add_tags', AddTags)
     response = request_add_tags(tags)
     if not response.success:
@@ -39,7 +41,10 @@ def add_tags(tags):
 
 
 def has_changed_velocity(cmd_vel):
-    '''Pass the test if "I see" occurs at least once'''
+    """
+        Pass the test if the command velocity on the robot changes
+        and the x coordinate of the linear equals 5 (move forward at 5m/s)
+    """
     if IS_CANCELLED:
         return
 
@@ -52,12 +57,12 @@ def has_changed_velocity(cmd_vel):
 
 
 def timeout_test(timeout):
-    '''
+    """
         Cancel the test if it times out. The timeout is based on the
         /clock topic to simulate playback taking too long. Use the
         RoboMaker simulation job duration to timeout based on a
         wallclock duration.
-    '''
+    """
     rospy.loginfo("Test timeout called")
     if not IS_CANCELLED:
         rospy.loginfo("Test timed out, cancelling job")
@@ -69,11 +74,11 @@ def timeout_test(timeout):
 
 
 def run(clock_timeout):
-    '''
+    """
         Run the test. Connects to the /robomaker services for tagging and cancelling.
         Then subscribes to check for any "I see" messages. Will timeout if /clock
         exceeds the specified duration.
-    '''
+    """
     rospy.init_node('robomaker_voice_interaction_regression_test')
     rospy.loginfo('Running AWS RoboMaker voice interaction regression test')
     rospy.on_shutdown(on_shutdown)
@@ -97,7 +102,7 @@ def run(clock_timeout):
 
 
 def on_shutdown():
-    ''' Log a message when shutting down. '''
+    """ Log a message when shutting down. """
     rospy.loginfo(
         "Shutting down AWS RoboMaker Voice Interaction regression test node")
 
