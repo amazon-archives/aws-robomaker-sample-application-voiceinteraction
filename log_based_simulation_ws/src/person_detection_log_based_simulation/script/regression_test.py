@@ -76,8 +76,8 @@ def timeout_test(timeout):
 def run(clock_timeout):
     """
         Run the test. Connects to the /robomaker services for tagging and cancelling.
-        Then subscribes to check for any "I see" messages. Will timeout if /clock
-        exceeds the specified duration.
+        Then subscribes to check if /cmd_vel is changed on the robot.
+        Will timeout if /clock exceeds the specified duration.
     """
     rospy.init_node('robomaker_voice_interaction_regression_test')
     rospy.loginfo('Running AWS RoboMaker voice interaction regression test')
