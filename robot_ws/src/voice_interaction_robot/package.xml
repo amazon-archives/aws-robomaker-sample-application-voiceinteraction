@@ -1,34 +1,31 @@
-<?xml version="1.0"?>
-<package format="2">
+<?xml version='1.0' encoding='utf-8'?>
+<package format="3">
   <name>voice_interaction_robot</name>
-  <version>1.2.0</version>
+  <version>2.0.0</version>
   <description>
-    AWS RoboMaker robot package provides one basic example for using a Turtlebot3 with Amazon Lex and Amazon Polly
+    AWS RoboMaker robot package that shows how to use a Turtlebot3 with Amazon Lex and Amazon Polly
   </description>
   <license>MIT</license>
   <author email="ros-contributions@amazon.com">AWS RoboMaker</author>
   <maintainer email="ros-contributions@amazon.com">AWS RoboMaker</maintainer>
-  <buildtool_depend>catkin</buildtool_depend>
-  <depend>rospy</depend>
-  <depend>actionlib</depend>
-  <depend>interactive_markers</depend>
+  <depend>rclpy</depend>
   <depend>std_msgs</depend>
-  <depend>sensor_msgs</depend>
-  <depend>geometry_msgs</depend>
-  <depend>nav_msgs</depend>
-  <depend>visualization_msgs</depend>
   <depend>audio_common_msgs</depend>
-  <depend>actionlib_msgs</depend>
   <depend>lex_common_msgs</depend>
   <depend>voice_interaction_robot_msgs</depend>
+  <depend>aws_common</depend>
+  <depend>aws_ros2_common</depend>
   <depend>turtlebot3</depend>
   <depend>turtlebot3_msgs</depend>
+  <depend>builtin_interfaces</depend>
   <depend>python-pyaudio</depend>
+  <depend>python3-rospkg</depend>
   <depend>tts</depend>
-  <build_depend>message_generation</build_depend>
-  <build_export_depend>message_runtime</build_export_depend>
-  <exec_depend>message_runtime</exec_depend>
-  <exec_depend>turtlebot3_bringup</exec_depend>
-  <exec_depend>python-rospkg</exec_depend>
-  <exec_depend>lex_node</exec_depend>
+  <depend>lex_node</depend>
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <member_of_group>rosidl_interface_packages</member_of_group>
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
 </package>
