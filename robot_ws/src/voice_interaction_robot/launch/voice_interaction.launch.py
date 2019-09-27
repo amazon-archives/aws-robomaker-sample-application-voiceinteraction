@@ -56,7 +56,7 @@ def generate_launch_description():
             package='voice_interaction_robot',
             node_executable='voice_input',
             node_name='voice_input',
-            output=launch.substitutions.LaunchConfiguration('output'),
+            output='screen',
             parameters=[
                 {
                     'use_sim_time': launch.substitutions.LaunchConfiguration('use_sim_time')
@@ -72,7 +72,7 @@ def generate_launch_description():
             package='voice_interaction_robot',
             node_executable='voice_output',
             node_name='voice_output',
-            output=launch.substitutions.LaunchConfiguration('output'),
+            output='screen',
             parameters=[
                 {
                     'use_sim_time': launch.substitutions.LaunchConfiguration('use_sim_time')
@@ -85,7 +85,7 @@ def generate_launch_description():
             package='voice_interaction_robot',
             node_executable='audio_output',
             node_name='audio_output',
-            output=launch.substitutions.LaunchConfiguration('output'),
+            output='screen',
             parameters=[
                 {
                     'use_sim_time': launch.substitutions.LaunchConfiguration('use_sim_time')
@@ -98,7 +98,7 @@ def generate_launch_description():
             package='voice_interaction_robot',
             node_executable='voice_interaction',
             node_name='voice_interaction',
-            output=launch.substitutions.LaunchConfiguration('output'),
+            output='screen',
             parameters=[
                 {
                     'use_sim_time': launch.substitutions.LaunchConfiguration('use_sim_time')
@@ -116,7 +116,7 @@ def generate_launch_description():
             package='voice_interaction_robot',
             node_executable='voice_command_translator',
             node_name='voice_command_translator',
-            output=launch.substitutions.LaunchConfiguration('output'),
+            output='screen',
             parameters=[
                 {
                     'use_sim_time': launch.substitutions.LaunchConfiguration('use_sim_time')
@@ -126,7 +126,7 @@ def generate_launch_description():
         launch.actions.IncludeLaunchDescription(
             launch.launch_description_sources.PythonLaunchDescriptionSource(
                 os.path.join(get_package_share_directory(
-                    'lex_node'), 'launch/lex_node.launch.py')
+                    'lex_node'), 'launch/lex.launch.py')
             ),
             launch_arguments={
                 'config_file': get_package_share_directory('voice_interaction_robot') + '/config/lex_config.yaml',

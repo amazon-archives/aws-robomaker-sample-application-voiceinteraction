@@ -103,9 +103,9 @@ class VoiceInteractionIntegrationTest:
     
     def __init__(self):
         rospy.init_node("integration_test", disable_signals=True)
-        self.text_input_publisher = rospy.Publisher("/text_input", String, queue_size=5)
-        self.audio_input_publisher = rospy.Publisher("/audio_input", AudioData, queue_size=5)
-        self.wake_publisher = rospy.Publisher("/wake_word", String, queue_size=5)
+        self.text_input_publisher = rospy.Publisher("/text_input", String, 5)
+        self.audio_input_publisher = rospy.Publisher("/audio_input", AudioData, 5)
+        self.wake_publisher = rospy.Publisher("/wake_word", String, 5)
         rospy.Subscriber("/cmd_vel", Twist, self.save_cmd_vel)
         
     def run_tests(self):

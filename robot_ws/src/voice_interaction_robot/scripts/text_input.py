@@ -29,8 +29,8 @@ import time
 import threading
 from std_msgs.msg import String
 
-text_input_publisher = rospy.Publisher("/text_input", String, queue_size=5)
-wake_publisher = rospy.Publisher("/wake_word", String, queue_size=5)
+text_input_publisher = rospy.Publisher("/text_input", String, 5)
+wake_publisher = rospy.Publisher("/wake_word", String, 5)
 
 
 class TextInput:

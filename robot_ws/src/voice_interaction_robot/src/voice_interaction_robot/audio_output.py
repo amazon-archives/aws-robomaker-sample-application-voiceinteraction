@@ -20,12 +20,12 @@ import pyaudio
 
 import rclpy
 from rclpy.node import Node
-from audio_common_msgs.msg import AudioData
+from voice_interaction_robot_msgs.msg import AudioData
 
 class AudioOutput(Node):
     def __init__(self, node_name):
         super().__init__(node_name)
-        self.create_subscription(AudioData, "/audio_output", self.play_audio_data)
+        self.create_subscription(AudioData, "/audio_output", self.play_audio_data, 5)
         self.output_device_index = None
         self.get_output_device_index()
 

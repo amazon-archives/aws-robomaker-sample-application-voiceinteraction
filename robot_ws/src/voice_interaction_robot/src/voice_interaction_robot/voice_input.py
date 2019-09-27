@@ -24,7 +24,7 @@ from collections import deque
 
 import rclpy
 from rclpy.node import Node
-from audio_common_msgs.msg import AudioData
+from voice_interaction_robot_msgs.msg import AudioData
 
 class VoiceInput(Node):
     p = pyaudio.PyAudio()

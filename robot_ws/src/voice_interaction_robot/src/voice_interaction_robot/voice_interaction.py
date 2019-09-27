@@ -23,8 +23,7 @@ from rclpy.node import Node
 
 from std_msgs.msg import String
 from lex_common_msgs.srv import AudioTextConversation
-from audio_common_msgs.msg import AudioData
-from voice_interaction_robot_msgs.msg import FulfilledVoiceCommand
+from voice_interaction_robot_msgs.msg import AudioData, FulfilledVoiceCommand
 
 """
  This node does not respond to lex commands until it has been awoken
@@ -58,14 +57,12 @@ class VoiceInteraction(Node):
         super().__init__(node_name)
         self.ww = WakeWord()
         self.get_logger().info("Initialized node %s" % node_name)
-        self.create_subscription(String, text_input_topic, self.handle_text_input)
-        self.create_subscription(AudioData, audio_input_topic, self.handle_audio_input)
-        self.create_subscription(String, wake_word_topic, self.handle_wake_message)
-        self.text_output_publisher = self.create_publisher(String, "/" + node_name + text_output_topic, queue_size=5)
-        self.audio_output_publisher = self.create_publisher(AudioData, "/" + node_name + audio_output_topic, queue_size=5)
-        self.fulfilled_command_publisher = self.create_publisher(FulfilledVoiceCommand, 
-                                                            "/" + node_name + fulfilled_command_topic,
-                                                            queue_size=5)
+        self.create_subscription(String, text_input_topic, self.handle_text_input, 5)
+        self.create_subscription(AudioData, audio_input_topic, self.handle_audio_input, 5)
+        self.create_subscription(String, wake_word_topic, self.handle_wake_message, 5)
+        self.text_output_publisher = self.create_publisher(String, "/" + node_name + text_output_topic, 5)
+        self.audio_output_publisher = self.create_publisher(AudioData, "/" + node_name + audio_output_topic, 5)
+        self.fulfilled_command_publisher = self.create_publisher(FulfilledVoiceCommand, "/" + node_name + fulfilled_command_topic, 5)
         self.lex_service = self.create_service(AudioTextConversation, "/lex_node/lex_conversation")
         self.use_polly = self.get_parameter("/voice_interaction/use_polly").value
 

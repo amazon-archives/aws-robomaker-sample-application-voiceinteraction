@@ -31,8 +31,8 @@ class VoiceCommandTranslator(Node):
 
     def __init__(self):
         super().__init__("voice_command_translator")
-        self.cmd_vel_publisher = self.create_publisher(Twist, '/cmd_vel', queue_size=10)
-        self.create_subscription(FulfilledVoiceCommand, '/voice_interaction_node/fulfilled_command', self.handle_voice_command)
+        self.cmd_vel_publisher = self.create_publisher(Twist, '/cmd_vel', 10)
+        self.create_subscription(FulfilledVoiceCommand, '/voice_interaction_node/fulfilled_command', self.handle_voice_command, 5)
 
     def handle_voice_command(self, command):
         self.get_logger().debug("Fulfilled lex command:")
