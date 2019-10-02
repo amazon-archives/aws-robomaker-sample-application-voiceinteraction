@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
  Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
@@ -32,10 +32,10 @@ from rclpy.node import Node
 from std_msgs.msg import String
 
 class TextInput(Node):
-    wake_words = ("jarvis", "turtlebot")
 
     def __init__(self, wake_publish_rate=5):
         super().__init__("text_input_script")
+        self.wake_words = ("jarvis", "turtlebot")
         self.text_input_publisher = self.create_publisher(String, "/text_input", 5)
         self.wake_publisher = self.create_publisher(String, "/wake_word", 5)
         self.create_subscription(String, "/text_output", self.display_response)
@@ -48,21 +48,23 @@ class TextInput(Node):
         if self.wake_publish_rate == 0:
             return
         while True:
-            self.wake_publisher.publish(self.wake_words[0])
+            msg = String(data=self.wake_words[0])
+            self.wake_publisher.publish(msg)
             time.sleep(self.wake_publish_rate)
 
     def send_text(self, text):
+        msg = String(data=text)
         if text in self.wake_words:
-            self.wake_publisher.publish(text)
+            self.wake_publisher.publish(msg)
             time.sleep(0.1)
-        self.text_input_publisher.publish(text)
+        self.text_input_publisher.publish(msg)
 
     def display_response(self, data):
         text = data.data
         print(text)
 
     def get_input(self):
-        text = raw_input("")
+        text = input("")
         if len(text) > 0:
             self.send_text(text)
         self.get_input()

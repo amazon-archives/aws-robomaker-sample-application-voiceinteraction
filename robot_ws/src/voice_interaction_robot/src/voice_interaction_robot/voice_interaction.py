@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
  Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
@@ -58,7 +57,7 @@ class VoiceInteraction(Node):
         self.declare_parameter("use_polly")
         self.use_polly = self.get_parameter("use_polly").value
         self.ww = WakeWord()
-        self.get_logger().info("Initialized node %s" % node_name)
+        self.get_logger().info(f"Initialized node {node_name}")
         self.create_subscription(String, text_input_topic, self.handle_text_input, 5)
         self.create_subscription(AudioData, audio_input_topic, self.handle_audio_input, 5)
         self.create_subscription(String, wake_word_topic, self.handle_wake_message, 5)
@@ -68,7 +67,7 @@ class VoiceInteraction(Node):
         self.lex_service = self.create_client(AudioTextConversation, "/lex_node/lex_conversation")
 
     def handle_wake_message(self, request):
-        self.get_logger().info('Received wake message "%s"' % request.data)
+        self.get_logger().info(f"Received wake message {request.data}")
         self.ww.handle_wake_message(request)
 
     def handle_text_input(self, request):
@@ -76,13 +75,15 @@ class VoiceInteraction(Node):
             return None
 
         user_input = request.data
-        self.get_logger().info("Received text input {}".format(user_input))
-        empty_audio_request = AudioData(data='')
-        lex_response = self.lex_service(content_type='text/plain; charset=utf-8',
-                                   accept_type='text/plain; charset=utf-8',
-                                   text_request=user_input,
-                                   audio_request=empty_audio_request)
-        self.handle_lex_response(lex_response)
+        self.get_logger().info(f"Received text input {user_input}")
+        lex_service_request = AudioTextConversation.Request()
+        lex_service_request.content_type = 'text/plain; charset=utf-8'
+        lex_service_request.accept_type = 'text/plain; charset=utf-8'
+        lex_service_request.text_request = user_input
+        lex_service_request.audio_request = []
+        future = self.lex_service.call_async(lex_service_request)
+        rclpy.spin_until_future_complete(self, future)
+        self.handle_lex_response(future.result())
 
     def handle_audio_input(self, request):
         if not self.ww.is_awake():
@@ -92,11 +93,14 @@ class VoiceInteraction(Node):
         accept_type = 'text/plain; charset=utf-8'
         if self.use_polly:
             accept_type = 'audio/pcm'
-        lex_response = self.lex_service(content_type='audio/x-l16; sample-rate=16000; channel-count=1',
-                                   accept_type=accept_type,
-                                   text_request=None,
-                                   audio_request=AudioData(data=audio_data))
-        self.handle_lex_response(lex_response)
+        lex_service_request = AudioTextConversation.Request()
+        lex_service_request.content_type = 'audio/x-l16; sample-rate=16000; channel-count=1'
+        lex_service_request.accept_type = accept_type
+        lex_service_request.text_request = None
+        lex_service_request.audio_request = audio_data
+        future = self.lex_service.call_async(lex_service_request)
+        rclpy.spin_until_future_complete(self, future)
+        self.handle_lex_response(future.result())
 
     def handle_lex_response(self, lex_response):
         self.ww.awaken()  # Stay awake after each lex response for further commands

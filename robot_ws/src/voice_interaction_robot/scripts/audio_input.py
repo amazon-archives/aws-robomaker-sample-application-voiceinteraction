@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
  Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
@@ -67,7 +67,7 @@ class AudioInput(Node):
         self.audio_input_publisher.publish(audio_data)
 
     def get_input(self):
-        command = raw_input("Audio file or command:\n")
+        command = input("Audio file or command:\n")
         self.process_command(command)
         self.get_input()
 

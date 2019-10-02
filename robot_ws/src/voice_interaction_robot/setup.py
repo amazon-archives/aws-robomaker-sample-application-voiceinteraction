@@ -15,7 +15,9 @@ setup(
         ('share/' + package_name + '/config', ['config/lex_config.yaml']),
         ('share/' + package_name + '/config', ['config/VoiceInteractionRobot.json']),
         ('share/' + package_name, ['package.xml']),
-        ('lib/' + package_name, ['test/integration_test.py'])
+        ('lib/' + package_name, ['test/integration_test.py']),
+        ('lib/' + package_name, ['scripts/audio_input.py']),
+        ('lib/' + package_name, ['scripts/text_input.py']),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -38,7 +40,6 @@ setup(
     entry_points={
         'console_scripts': [
             'audio_output = voice_interaction_robot.audio_output:main',
-            'integration_test = voice_interaction_robot.integration_test:main',
             'voice_command_translator = voice_interaction_robot.voice_command_translator:main',
             'voice_input = voice_interaction_robot.voice_input:main',
             'voice_interaction = voice_interaction_robot.voice_interaction:main',
