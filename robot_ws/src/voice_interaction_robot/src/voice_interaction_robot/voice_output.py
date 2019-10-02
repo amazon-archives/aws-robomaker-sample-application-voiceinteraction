@@ -19,10 +19,9 @@
 import actionlib
 import rclpy
 from rclpy.node import Node
+from rclpy.action.client import ActionClient
 from std_msgs.msg import String
 from tts.msg import SpeechAction, SpeechGoal
-
-polly_client = actionlib.SimpleActionClient('tts', SpeechAction)
 
 
 class VoiceOutput(Node):
@@ -45,7 +44,7 @@ class VoiceOutput(Node):
 
 def main():
     rclpy.init()
-    voice_output = VoiceOutput(node_name="voice_output_node")
+    voice_output = VoiceOutput(node_name="voice_output")
     rclpy.spin(voice_output)
 
 

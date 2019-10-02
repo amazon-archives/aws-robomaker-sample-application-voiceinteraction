@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
- Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
  Permission is hereby granted, free of charge, to any person obtaining a copy of this
  software and associated documentation files (the "Software"), to deal in the Software
@@ -24,20 +24,21 @@
   It automatically keeps the robot awake by publishing a message to /wake_word every n seconds (5 by default)
 """
 
-import rospy
 import time
 import threading
+
+import rclpy
+from rclpy.node import Node
 from std_msgs.msg import String
 
-text_input_publisher = rospy.Publisher("/text_input", String, 5)
-wake_publisher = rospy.Publisher("/wake_word", String, 5)
-
-
-class TextInput:
+class TextInput(Node):
     wake_words = ("jarvis", "turtlebot")
 
     def __init__(self, wake_publish_rate=5):
-        rospy.Subscriber("/text_output", String, self.display_response)
+        super().__init__("text_input_script")
+        self.text_input_publisher = self.create_publisher(String, "/text_input", 5)
+        self.wake_publisher = self.create_publisher(String, "/wake_word", 5)
+        self.create_subscription(String, "/text_output", self.display_response)
         self.wake_publish_rate = wake_publish_rate
         wake_thread = threading.Thread(name='wake', target=self.keep_robot_awake)
         wake_thread.daemon = True
@@ -47,14 +48,14 @@ class TextInput:
         if self.wake_publish_rate == 0:
             return
         while True:
-            wake_publisher.publish(self.wake_words[0])
+            self.wake_publisher.publish(self.wake_words[0])
             time.sleep(self.wake_publish_rate)
 
     def send_text(self, text):
         if text in self.wake_words:
-            wake_publisher.publish(text)
+            self.wake_publisher.publish(text)
             time.sleep(0.1)
-        text_input_publisher.publish(text)
+        self.text_input_publisher.publish(text)
 
     def display_response(self, data):
         text = data.data
@@ -76,7 +77,7 @@ stop                                        - Stop all movement
 
 """
     print(usage)
-    rospy.init_node("text_input_script", disable_signals=True)
+    rclpy.init()
     text_input = TextInput()
     text_input.get_input()
 

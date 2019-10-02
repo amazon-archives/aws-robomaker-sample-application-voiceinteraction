@@ -18,6 +18,7 @@ find_package(rosidl_default_generators REQUIRED)
 set(msg_files
         "msg/AudioData.msg"
         "msg/FulfilledVoiceCommand.msg"
+        "msg/KeyValue.msg"
         )
 
 rosidl_generate_interfaces(${PROJECT_NAME}

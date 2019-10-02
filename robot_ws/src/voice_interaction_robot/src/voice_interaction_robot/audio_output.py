@@ -62,7 +62,7 @@ class AudioOutput(Node):
 
 def main():
     rclpy.init()
-    audio_output = AudioOutput(node_name="audio_output_node")
+    audio_output = AudioOutput(node_name="audio_output")
     rclpy.spin(audio_output)
 
 

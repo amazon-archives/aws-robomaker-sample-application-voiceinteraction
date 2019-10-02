@@ -145,7 +145,7 @@ class VoiceInput(Node):
 
 def main():
     rclpy.init()
-    voice_input = VoiceInput(node_name="voice_input_node")
+    voice_input = VoiceInput(node_name="voice_input")
     voice_input.audio_int()
     voice_input.listen()
 

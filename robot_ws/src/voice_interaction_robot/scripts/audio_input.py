@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
- Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
  Permission is hereby granted, free of charge, to any person obtaining a copy of this
  software and associated documentation files (the "Software"), to deal in the Software
@@ -24,30 +24,32 @@
   It automatically keeps the robot awake by publishing a message to /wake_word every n seconds (5 by default)
 """
 
-import rospy
-import rospkg
-from voice_interaction_robot_msgs.msg import AudioData
-from std_msgs.msg import String
-import numpy as np
 import os
 import time
 import threading
+
+import numpy as np
+import rclpy
+from rclpy.node import Node
+import rospkg
+from std_msgs.msg import String
+
+from voice_interaction_robot_msgs.msg import AudioData
 
 WAV_HEADER_LENGTH = 24
 DEFAULT_ASSETS_DIR = rospkg.RosPack().get_path('voice_interaction_robot') + "/assets"
 DEFAULT_ASSETS_EXT = ".wav"
 
-audio_input_publisher = rospy.Publisher("/audio_input", AudioData, 5)
-audio_output_publisher = rospy.Publisher("/audio_output", AudioData, 5)
-wake_publisher = rospy.Publisher("/wake_word", String, 5)
-
-
-class AudioInput():
+class AudioInput(Node):
     current_directory = DEFAULT_ASSETS_DIR
     default_extension = DEFAULT_ASSETS_EXT
     wake_words = ("jarvis", "turtlebot")
 
     def __init__(self, wake_publish_rate=5):
+        super().__init__("audio_input_script")
+        self.audio_input_publisher = self.create_publisher(AudioData, "/audio_input", 5)
+        self.audio_output_publisher = self.create_publisher(AudioData, "/audio_output", 5)
+        self.wake_publisher = self.create_publisher(String, "/wake_word", 5)
         self.wake_publish_rate = wake_publish_rate
         wake_thread = threading.Thread(name='wake', target=self.keep_robot_awake)
         wake_thread.daemon = True
@@ -57,12 +59,12 @@ class AudioInput():
         if self.wake_publish_rate == 0:
             return
         while True:
-            wake_publisher.publish(self.wake_words[0])
+            self.wake_publisher.publish(self.wake_words[0])
             time.sleep(self.wake_publish_rate)
 
     def send_audio(self, data):
         audio_data = data.tolist()
-        audio_input_publisher.publish(audio_data)
+        self.audio_input_publisher.publish(audio_data)
 
     def get_input(self):
         command = raw_input("Audio file or command:\n")
@@ -77,7 +79,7 @@ class AudioInput():
             self.set_default_extension(command)
             return
         if self.command_contains_wake_word(command):
-            wake_publisher.publish("wake")
+            self.wake_publisher.publish("wake")
             time.sleep(0.1)
         self.process_filepath(command)
 
@@ -113,7 +115,7 @@ class AudioInput():
 
     def play_audio_data(self, data):
         audio_data = data.astype(np.uint8).tostring()
-        audio_output_publisher.publish(audio_data)
+        self.audio_output_publisher.publish(audio_data)
 
 
 def main():
@@ -129,7 +131,7 @@ Helpers
 /ext <extension> set the default extension that all audio files will have (default: {DEFAULT_ASSETS_EXT})
 """.format(DEFAULT_ASSETS_DIR=DEFAULT_ASSETS_DIR, DEFAULT_ASSETS_EXT=DEFAULT_ASSETS_EXT)
     print(usage)
-    rospy.init_node("audio_input_script", disable_signals=True)
+    rospy.init()
     audio_input = AudioInput()
     audio_input.get_input()
 
