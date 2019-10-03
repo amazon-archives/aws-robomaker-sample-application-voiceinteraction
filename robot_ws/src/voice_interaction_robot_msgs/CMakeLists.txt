@@ -12,18 +12,18 @@ endif()
 
 find_package(ament_cmake REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(lex_common_msgs REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
 set(msg_files
         "msg/AudioData.msg"
         "msg/FulfilledVoiceCommand.msg"
-        "msg/KeyValue.msg"
         )
 
 rosidl_generate_interfaces(${PROJECT_NAME}
         ${msg_files}
-        DEPENDENCIES builtin_interfaces std_msgs
+        DEPENDENCIES builtin_interfaces std_msgs lex_common_msgs
         )
         
 ament_export_dependencies(rosidl_default_runtime)

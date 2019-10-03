@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
  Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
@@ -22,24 +21,23 @@
     It can be launched with the integration_test launch file and it will output
     how many tests are to be run and the results for each test. 
 """
-
-import rospy
-import rospkg
-import rosnode
-import rostopic
-import rosservice
 import time
 import os
+
 import numpy as np
+import rclpy
+from rclpy.node import Node
+from ament_index_python.packages import get_package_prefix
+
 from std_msgs.msg import String
 from geometry_msgs.msg import Twist, Vector3
-from audio_common_msgs.msg import AudioData
+from voice_interaction_robot_msgs.msg import AudioData
 
 WAV_HEADER_LENGTH = 24
-AUDIO_ASSETS_DIR = rospkg.RosPack().get_path('voice_interaction_robot') + "/assets"
+AUDIO_ASSETS_DIR = get_package_prefix('voice_interaction_robot') + "/assets/voice_interaction_robot/"
 AUDIO_EXTENSION = ".wav"
 
-class IntegrationTest:
+class IntegrationTest():
     wait_between_audio_commands = 1
     
     def __init__(self, text_input_publisher, audio_input_publisher, test_type, commands, expected_result):
@@ -64,7 +62,7 @@ class IntegrationTest:
             self.send_text(command)
             
     def send_text(self, text):
-        self.text_input_publisher.publish(text)
+        self.text_input_publisher.publish(String(data=text))
         
     def run_audio_input_test(self):
         for filename in self.commands:
@@ -76,7 +74,7 @@ class IntegrationTest:
         raw_data = self.load_wav_file(full_path)
         if raw_data is not None:
             audio_data = raw_data.tolist() 
-            self.audio_input_publisher.publish(audio_data)
+            self.audio_input_publisher.publish(AudioData(data=audio_data))
 
     def load_wav_file(self, filepath):
         if not os.path.exists(filepath):
@@ -85,15 +83,15 @@ class IntegrationTest:
         data = np.fromfile(open(filepath), np.uint8)[WAV_HEADER_LENGTH:]
         return data
 
-    def check_result(self, result):
+    def check_result(self, logger, result):
         if result == self.expected_result:
             return True
         else:
-            rospy.loginfo("{}, result:\n{}".format(self, result))
-            rospy.loginfo("expected result:\n{}".format(self.expected_result))
+            logger.info(f"result:{result}")
+            logger.info(f"expected result:{self.expected_result}")
             return False
         
-class VoiceInteractionIntegrationTest:
+class VoiceInteractionIntegrationTest(Node):
     wake_words = ("jarvis", "turtlebot")
     last_cmd_vel = None
     vinode_start_timeout = 10
@@ -102,19 +100,19 @@ class VoiceInteractionIntegrationTest:
     max_retries_per_test = 1
     
     def __init__(self):
-        rospy.init_node("integration_test", disable_signals=True)
-        self.text_input_publisher = rospy.Publisher("/text_input", String, 5)
-        self.audio_input_publisher = rospy.Publisher("/audio_input", AudioData, 5)
-        self.wake_publisher = rospy.Publisher("/wake_word", String, 5)
-        rospy.Subscriber("/cmd_vel", Twist, self.save_cmd_vel)
+        super().__init__("integration_test")
+        self.text_input_publisher = self.create_publisher(String, "/text_input", 5)
+        self.audio_input_publisher = self.create_publisher(AudioData, "/audio_input", 5)
+        self.wake_publisher = self.create_publisher(String, "/wake_word", 5)
+        self.create_subscription(Twist, "/cmd_vel", self.save_cmd_vel, 5)
         
     def run_tests(self):
         self.wait_for_voice_interaction_nodes()
         self.wait_for_voice_interaction_services()
-        self.wait_for_voice_interaction_node_to_subscribe_to_topic()
+        # self.wait_for_voice_interaction_node_to_subscribe_to_topic()
         self.load_text_input_tests()
         self.load_audio_input_tests()
-        rospy.loginfo("Total tests: {}".format(len(self.tests)))
+        self.get_logger().info(f"Total tests: {len(self.tests)}")
         # Before running any tests, wake the robot and wait for a slightly longer period of time.
         self.wake_robot(2.0)
         for test in self.tests:
@@ -125,17 +123,17 @@ class VoiceInteractionIntegrationTest:
         retry_count = 0
         while retry_count <= self.max_retries_per_test:
             if retry_count > 0:
-                rospy.loginfo("Retrying failed test {}".format(test))
+                self.get_logger().info("Retrying failed test {}".format(test))
                 time.sleep(self.test_sleep_time)
             test.run_test()
             time.sleep(self.test_sleep_time)
-            if test.check_result(self.last_cmd_vel):
-                rospy.loginfo("test passed")
+            if test.check_result(self.get_logger(), self.last_cmd_vel):
+                self.get_logger().info("test passed")
                 return
             else:
                 retry_count += 1
 
-        rospy.loginfo("test failed")
+        self.get_logger().info("test failed")
         
     def wait_for_voice_interaction_nodes(self):
         required_nodes = set([
@@ -143,29 +141,45 @@ class VoiceInteractionIntegrationTest:
             '/voice_interaction', 
             '/voice_command_translator'
         ])
-        while not required_nodes.issubset(rosnode.get_node_names()):
-            time.sleep(0.1)
+        time.sleep(1)
+        # while not required_nodes.issubset(rosnode.get_node_names()):
+            # time.sleep(0.1)
             
     def wait_for_voice_interaction_services(self):
         required_services = set([
             '/lex_node/lex_conversation'
         ])
-        while not required_services.issubset(rosservice.get_service_list()):
-            time.sleep(0.1)
+        time.sleep(1)
+        # while not required_services.issubset(rosservice.get_service_list()):
+            # time.sleep(0.1)
             
     def wait_for_voice_interaction_node_to_subscribe_to_topic(self):
         rostopic.wait_for_subscriber(self.text_input_publisher, self.vinode_start_timeout)
         rostopic.wait_for_subscriber(self.wake_publisher, self.vinode_start_timeout)
+
+    def create_twist(self, linear, angular):
+        return Twist(
+            linear=Vector3(
+                x=float(linear[0]),
+                y=float(linear[1]),
+                z=float(linear[2])
+            ),
+            angular=Vector3(
+                x=float(angular[0]),
+                y=float(angular[1]),
+                z=float(angular[2])
+            )
+        )
             
     def load_text_input_tests(self):
         text_input_tests = [
-            (["move", "forward", "5"], Twist(Vector3(5,0,0), Vector3(0,0,0))),
-            (["move", "backwards", "0.2"], Twist(Vector3(-0.2,0,0), Vector3(0,0,0))),
-            (["move forward 2"], Twist(Vector3(2,0,0), Vector3(0,0,0))),
-            (["rotate left 10"], Twist(Vector3(0,0,0), Vector3(0,0,10))),
-            (["rotate", "clockwise",  "5"], Twist(Vector3(0,0,0), Vector3(0,0,-5))),
-            (["stop"], Twist(Vector3(0,0,0), Vector3(0,0,0))),
-            (["halt"], Twist(Vector3(0,0,0), Vector3(0,0,0)))
+            (["move", "forward", "5"], self.create_twist((5,0,0), (0,0,0))),
+            (["move", "backwards", "0.2"], self.create_twist((-0.2,0,0), (0,0,0))),
+            (["move forward 2"], self.create_twist((2,0,0), (0,0,0))),
+            (["rotate left 10"], self.create_twist((0,0,0), (0,0,10))),
+            (["rotate", "clockwise",  "5"], self.create_twist((0,0,0), (0,0,-5))),
+            (["stop"], self.create_twist((0,0,0), (0,0,0))),
+            (["halt"], self.create_twist((0,0,0), (0,0,0)))
         ]
         for test in text_input_tests:
             (command, expected_result) = test
@@ -175,11 +189,11 @@ class VoiceInteractionIntegrationTest:
         
     def load_audio_input_tests(self):
         audio_input_tests = [
-            (["move-forward-5"], Twist(Vector3(5,0,0), Vector3(0,0,0))),
-            (["turn-clockwise-3"], Twist(Vector3(0,0,0), Vector3(0,0,-3))),
-            (["stop"], Twist(Vector3(0,0,0), Vector3(0,0,0))),
-            (["turn", "counterclockwise", "10"], Twist(Vector3(0,0,0), Vector3(0,0,10))),
-            (["rotate", "clockwise", "5"], Twist(Vector3(0,0,0), Vector3(0,0,-5))),
+            (["move-forward-5"], self.create_twist((5,0,0), (0,0,0))),
+            (["turn-clockwise-3"], self.create_twist((0,0,0), (0,0,-3))),
+            (["stop"], self.create_twist((0,0,0), (0,0,0))),
+            (["turn", "counterclockwise", "10"], self.create_twist((0,0,0), (0,0,10))),
+            (["rotate", "clockwise", "5"], self.create_twist((0,0,0), (0,0,-5))),
         ]
         for test in audio_input_tests:
             (command, expected_result) = test
@@ -188,18 +202,19 @@ class VoiceInteractionIntegrationTest:
             self.tests.append(integration_test)
             
     def wake_robot(self, post_wake_sleep=0.1):
-        self.wake_publisher.publish(self.wake_words[0])
+        self.wake_publisher.publish(String(data=self.wake_words[0]))
         time.sleep(post_wake_sleep)
         
     def save_cmd_vel(self, data):
-        rospy.logdebug("Received new cmd_vel: {}".format(data))
+        self.get_logger().debug("Received new cmd_vel: {}".format(data))
         self.last_cmd_vel = data
 
 def main():
+    rclpy.init()
     vi_integration_test = VoiceInteractionIntegrationTest()
-    rospy.loginfo("Starting integration tests")
+    vi_integration_test.get_logger().info("Starting integration tests")
     vi_integration_test.run_tests()
-    rospy.loginfo("Integration tests complete")
+    vi_integration_test.get_logger().info("Integration tests complete")
 
 
 if __name__ == "__main__":

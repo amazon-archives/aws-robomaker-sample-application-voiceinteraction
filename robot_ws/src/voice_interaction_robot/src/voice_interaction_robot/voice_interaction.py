@@ -64,7 +64,7 @@ class VoiceInteraction(Node):
         self.text_output_publisher = self.create_publisher(String, "/" + node_name + text_output_topic, 5)
         self.audio_output_publisher = self.create_publisher(AudioData, "/" + node_name + audio_output_topic, 5)
         self.fulfilled_command_publisher = self.create_publisher(FulfilledVoiceCommand, "/" + node_name + fulfilled_command_topic, 5)
-        self.lex_service = self.create_client(AudioTextConversation, "/lex_node/lex_conversation")
+        self.lex_service = self.create_client(AudioTextConversation, "/lex_conversation")
 
     def handle_wake_message(self, request):
         self.get_logger().info(f"Received wake message {request.data}")
@@ -81,9 +81,10 @@ class VoiceInteraction(Node):
         lex_service_request.accept_type = 'text/plain; charset=utf-8'
         lex_service_request.text_request = user_input
         lex_service_request.audio_request = []
+        while not self.lex_service.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('service not available, waiting again...')
         future = self.lex_service.call_async(lex_service_request)
-        rclpy.spin_until_future_complete(self, future)
-        self.handle_lex_response(future.result())
+        future.add_done_callback(self.handle_lex_response)
 
     def handle_audio_input(self, request):
         if not self.ww.is_awake():
@@ -96,13 +97,13 @@ class VoiceInteraction(Node):
         lex_service_request = AudioTextConversation.Request()
         lex_service_request.content_type = 'audio/x-l16; sample-rate=16000; channel-count=1'
         lex_service_request.accept_type = accept_type
-        lex_service_request.text_request = None
         lex_service_request.audio_request = audio_data
         future = self.lex_service.call_async(lex_service_request)
         rclpy.spin_until_future_complete(self, future)
         self.handle_lex_response(future.result())
 
-    def handle_lex_response(self, lex_response):
+    def handle_lex_response(self, future: AudioTextConversation.Response):
+        lex_response = future.result()
         self.ww.awaken()  # Stay awake after each lex response for further commands
         if lex_response.dialog_state not in ("Fulfilled", "ReadyForFulfillment"):
             self.publish_lex_response(lex_response)
@@ -117,9 +118,9 @@ class VoiceInteraction(Node):
 
     def publish_lex_response(self, lex_response):
         if len(lex_response.text_response) > 0:
-            self.text_output_publisher.publish(lex_response.text_response)
-        if len(lex_response.audio_response.data) > 0:
-            self.audio_output_publisher.publish(lex_response.audio_response)
+            self.text_output_publisher.publish(String(data=lex_response.text_response))
+        if len(lex_response.audio_response) > 0:
+            self.audio_output_publisher.publish(AudioData(data=lex_response.audio_response))
 
 
 def main():

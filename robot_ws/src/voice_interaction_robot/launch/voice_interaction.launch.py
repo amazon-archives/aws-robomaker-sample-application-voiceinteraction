@@ -30,8 +30,8 @@ def generate_launch_description():
     with open(default_lex_config, 'r') as f:
       config_text = f.read()
     config_yaml = yaml.safe_load(config_text)
-    default_aws_region = config_yaml['voice_interaction_robot']['ros__parameters']['aws_client_configuration']['region']
-    default_lex_user_id = config_yaml['voice_interaction_robot']['ros__parameters']['lex_configuration']['user_id']
+    default_aws_region = config_yaml['lex_node']['ros__parameters']['aws_client_configuration']['region']
+    default_lex_user_id = config_yaml['lex_node']['ros__parameters']['lex_configuration']['user_id']
 
     ld = launch.LaunchDescription([
         launch.actions.DeclareLaunchArgument(
@@ -80,7 +80,7 @@ def generate_launch_description():
                 }
             ],
             remappings={
-                '/voice_input_node/audio_input': '/audio_input',
+                '/voice_input/audio_input': '/audio_input',
             }.items(),
             condition=launch.conditions.IfCondition(
                 launch.substitutions.LaunchConfiguration('use_microphone'))
@@ -116,6 +116,7 @@ def generate_launch_description():
             node_executable='voice_interaction',
             node_name='voice_interaction',
             output='screen',
+            additional_env={'PYTHONUNBUFFERED' : '1'},
             parameters=[
                 {
                     'use_sim_time': launch.substitutions.LaunchConfiguration('use_sim_time'),
@@ -123,8 +124,8 @@ def generate_launch_description():
                 },
             ],
             remappings={
-                '/voice_interaction_node/text_output': '/text_output',
-                '/voice_interaction_node/audio_output': '/audio_output'
+                '/voice_interaction/text_output': '/text_output',
+                '/voice_interaction/audio_output': '/audio_output'
             }.items()
         ),
         launch_ros.actions.Node(
@@ -132,6 +133,7 @@ def generate_launch_description():
             node_executable='voice_command_translator',
             node_name='voice_command_translator',
             output='screen',
+            additional_env={'PYTHONUNBUFFERED' : '1'},
             parameters=[
                 {
                     'use_sim_time': launch.substitutions.LaunchConfiguration('use_sim_time')

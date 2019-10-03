@@ -32,12 +32,12 @@ def generate_launch_description():
                 'z_pos': '0.3'
             }.items()
         ),
-        launch.actions.IncludeLaunchDescription(
-            launch.launch_description_sources.PythonLaunchDescriptionSource(
-                os.path.join(get_package_share_directory(
-                    'voice_interaction_simulation'), 'launch/spawn_balls.launch.py')
-            )
-        )
+        # launch.actions.IncludeLaunchDescription(
+        #     launch.launch_description_sources.PythonLaunchDescriptionSource(
+        #         os.path.join(get_package_share_directory(
+        #             'voice_interaction_simulation'), 'launch/spawn_balls.launch.py')
+        #     )
+        # )
     ])
     return ld
 

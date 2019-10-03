@@ -44,7 +44,7 @@ class VoiceInput(Node):
         self.stream = None
         self.input_device_index = None
         self.output_device_index = None
-        self.audio_publisher = self.create_publisher(AudioData, "/voice_input_node/audio_input")
+        self.audio_publisher = self.create_publisher(AudioData, "/voice_input/audio_input")
 
     def open_stream(self):
         self.close_stream()

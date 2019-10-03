@@ -1,4 +1,4 @@
-voice_interaction_robot:
+lex_node:
   ros__parameters:
     aws_client_configuration:
       region: "us-west-2"

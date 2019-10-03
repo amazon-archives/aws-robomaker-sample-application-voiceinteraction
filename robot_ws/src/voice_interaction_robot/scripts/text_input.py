@@ -38,11 +38,13 @@ class TextInput(Node):
         self.wake_words = ("jarvis", "turtlebot")
         self.text_input_publisher = self.create_publisher(String, "/text_input", 5)
         self.wake_publisher = self.create_publisher(String, "/wake_word", 5)
-        self.create_subscription(String, "/text_output", self.display_response)
         self.wake_publish_rate = wake_publish_rate
         wake_thread = threading.Thread(name='wake', target=self.keep_robot_awake)
         wake_thread.daemon = True
         wake_thread.start()
+        display_responses_thread = threading.Thread(name='display_responses', target=self.display_responses)
+        display_responses_thread.daemon = True
+        display_responses_thread.start()
 
     def keep_robot_awake(self):
         if self.wake_publish_rate == 0:
@@ -58,6 +60,10 @@ class TextInput(Node):
             self.wake_publisher.publish(msg)
             time.sleep(0.1)
         self.text_input_publisher.publish(msg)
+
+    def display_responses(self):
+        self.create_subscription(String, "/text_output", self.display_response, 5)
+        rclpy.spin(self)
 
     def display_response(self, data):
         text = data.data
