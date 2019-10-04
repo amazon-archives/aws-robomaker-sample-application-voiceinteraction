@@ -31,13 +31,14 @@ import threading
 import numpy as np
 import rclpy
 from rclpy.node import Node
+from ament_index_python.packages import get_package_prefix
 import rospkg
 from std_msgs.msg import String
 
 from voice_interaction_robot_msgs.msg import AudioData
 
 WAV_HEADER_LENGTH = 24
-DEFAULT_ASSETS_DIR = rospkg.RosPack().get_path('voice_interaction_robot') + "/assets"
+DEFAULT_ASSETS_DIR = get_package_prefix('voice_interaction_robot') + "/assets/voice_interaction_robot/"
 DEFAULT_ASSETS_EXT = ".wav"
 
 class AudioInput(Node):
@@ -59,12 +60,12 @@ class AudioInput(Node):
         if self.wake_publish_rate == 0:
             return
         while True:
-            self.wake_publisher.publish(self.wake_words[0])
+            self.wake_publisher.publish(String(data=self.wake_words[0]))
             time.sleep(self.wake_publish_rate)
 
     def send_audio(self, data):
         audio_data = data.tolist()
-        self.audio_input_publisher.publish(audio_data)
+        self.audio_input_publisher.publish(AudioData(data=audio_data))
 
     def get_input(self):
         command = input("Audio file or command:\n")
@@ -79,7 +80,7 @@ class AudioInput(Node):
             self.set_default_extension(command)
             return
         if self.command_contains_wake_word(command):
-            self.wake_publisher.publish("wake")
+            self.wake_publisher.publish(String(data="wake"))
             time.sleep(0.1)
         self.process_filepath(command)
 
@@ -115,7 +116,7 @@ class AudioInput(Node):
 
     def play_audio_data(self, data):
         audio_data = data.astype(np.uint8).tostring()
-        self.audio_output_publisher.publish(audio_data)
+        self.audio_output_publisher.publish(AudioData(data=audio_data))
 
 
 def main():
@@ -131,7 +132,7 @@ Helpers
 /ext <extension> set the default extension that all audio files will have (default: {DEFAULT_ASSETS_EXT})
 """.format(DEFAULT_ASSETS_DIR=DEFAULT_ASSETS_DIR, DEFAULT_ASSETS_EXT=DEFAULT_ASSETS_EXT)
     print(usage)
-    rospy.init()
+    rclpy.init()
     audio_input = AudioInput()
     audio_input.get_input()
 
