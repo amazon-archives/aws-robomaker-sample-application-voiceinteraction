@@ -97,10 +97,12 @@ class VoiceInteraction(Node):
         lex_service_request = AudioTextConversation.Request()
         lex_service_request.content_type = 'audio/x-l16; sample-rate=16000; channel-count=1'
         lex_service_request.accept_type = accept_type
+        lex_service_request.text_request = ''
         lex_service_request.audio_request = audio_data
+        while not self.lex_service.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('service not available, waiting again...')
         future = self.lex_service.call_async(lex_service_request)
-        rclpy.spin_until_future_complete(self, future)
-        self.handle_lex_response(future.result())
+        future.add_done_callback(self.handle_lex_response)
 
     def handle_lex_response(self, future: AudioTextConversation.Response):
         lex_response = future.result()

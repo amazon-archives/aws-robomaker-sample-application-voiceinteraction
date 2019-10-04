@@ -126,6 +126,7 @@ class VoiceInteractionIntegrationTest(Node):
                 self.get_logger().info("Retrying failed test {}".format(test))
                 time.sleep(self.test_sleep_time)
             test.run_test()
+            rclpy.spin_once(self)
             time.sleep(self.test_sleep_time)
             if test.check_result(self.get_logger(), self.last_cmd_vel):
                 self.get_logger().info("test passed")
@@ -206,7 +207,7 @@ class VoiceInteractionIntegrationTest(Node):
         time.sleep(post_wake_sleep)
         
     def save_cmd_vel(self, data):
-        self.get_logger().debug("Received new cmd_vel: {}".format(data))
+        self.get_logger().info("Received new cmd_vel: {}".format(data))
         self.last_cmd_vel = data
 
 def main():
