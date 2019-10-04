@@ -29,9 +29,7 @@ def generate_launch_description():
             package='voice_interaction_robot',
             node_executable='integration_test',
             node_name='integration_test',
-            output='screen',
-            on_exit=launch.actions.Shutdown(),
-
+            output='screen'
         ),
         launch.actions.IncludeLaunchDescription(
             launch.launch_description_sources.PythonLaunchDescriptionSource(
