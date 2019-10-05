@@ -50,8 +50,8 @@ jobs:
   - stage: Build & Bundle
     env: WORKSPACES="simulation_ws" UPLOAD_SOURCES="false"
   - stage: Upload sources
-      script: . .ros_ci/add_tag.sh && .ros_ci/prepare_sources_to_upload.sh && set +e
-      env: WORKSPACES="robot_ws simulation_ws"
+    script: . .ros_ci/add_tag.sh && .ros_ci/prepare_sources_to_upload.sh && set +e
+    env: WORKSPACES="robot_ws simulation_ws"
   - stage: Deploy
     script: . .ros_ci/add_tag.sh && set +e
     before_deploy: export APP_MANIFEST_REPO=AppManifest-${SA_NAME}-${ROS_DISTRO}-gazebo${GAZEBO_VERSION}
