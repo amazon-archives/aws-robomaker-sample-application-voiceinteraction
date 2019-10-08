@@ -146,9 +146,11 @@ def generate_launch_description():
                     'lex_node'), 'launch/lex.launch.py')
             ),
             launch_arguments={
+                'aws_region': launch.substitutions.LaunchConfiguration('aws_region'),
                 'config_file': get_package_share_directory('voice_interaction_robot') + '/config/lex_config.yaml',
                 'node_name': launch.substitutions.LaunchConfiguration('lex_node_name'),
-                'output': launch.substitutions.LaunchConfiguration('output')
+                'output': launch.substitutions.LaunchConfiguration('output'),
+                'user_id': launch.substitutions.LaunchConfiguration('user_id')
             }.items()
         )
     ])
