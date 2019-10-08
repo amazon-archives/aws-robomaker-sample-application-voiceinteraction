@@ -19,108 +19,110 @@ import os
 import sys
 
 import yaml
-import launch
-import launch_ros.actions
+from launch import LaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.conditions import IfCondition
+from launch.substitutions import LaunchConfiguration
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
 
 
 def generate_launch_description():
-    default_lex_config = os.path.join(get_package_share_directory('voice_interaction_robot'), 'config', 'lex_config.yaml')
+    config_file_path = os.path.join(get_package_share_directory(
+        'voice_interaction_robot'), 'config', 'lex_config.yaml')
 
-    with open(default_lex_config, 'r') as f:
-      config_text = f.read()
+    with open(config_file_path, 'r') as f:
+        config_text = f.read()
     config_yaml = yaml.safe_load(config_text)
     default_aws_region = config_yaml['lex_node']['ros__parameters']['aws_client_configuration']['region']
     default_lex_user_id = config_yaml['lex_node']['ros__parameters']['lex_configuration']['user_id']
 
-    ld = launch.LaunchDescription([
-        launch.actions.DeclareLaunchArgument(
+    ld = LaunchDescription([
+        DeclareLaunchArgument(
             name='aws_region',
             default_value=os.environ.get('ROS_AWS_REGION', default_aws_region),
             description='AWS region override, defaults to config .yaml if unset'
         ),
-        launch.actions.DeclareLaunchArgument(
+        DeclareLaunchArgument(
             name='output',
             default_value='screen',
             description='ROS stdout output location'
         ),
-        launch.actions.DeclareLaunchArgument(
+        DeclareLaunchArgument(
             name='user_id',
             default_value=os.environ.get('LEX_USER_ID', default_lex_user_id),
             description='UserID sent when communicating with the Lex Bot, can be any string. Defauls to value in config .yaml if unset'
         ),
-        launch.actions.DeclareLaunchArgument(
+        DeclareLaunchArgument(
             name='use_sim_time',
             default_value='true'
         ),
-        launch.actions.DeclareLaunchArgument(
+        DeclareLaunchArgument(
             name='lex_node_name',
             default_value='lex_node'
         ),
-        launch.actions.DeclareLaunchArgument(
+        DeclareLaunchArgument(
             name='use_polly',
             default_value='false'
         ),
-        launch.actions.DeclareLaunchArgument(
+        DeclareLaunchArgument(
             name='use_microphone',
             default_value='false'
         ),
-        launch.actions.DeclareLaunchArgument(
+        DeclareLaunchArgument(
             name='use_speaker',
             default_value='false'
         ),
-        launch_ros.actions.Node(
+        Node(
             package='voice_interaction_robot',
             node_executable='voice_input',
             node_name='voice_input',
             output='screen',
             parameters=[
                 {
-                    'use_sim_time': launch.substitutions.LaunchConfiguration('use_sim_time')
+                    'use_sim_time': LaunchConfiguration('use_sim_time')
                 }
             ],
             remappings={
                 '/voice_input/audio_input': '/audio_input',
             }.items(),
-            condition=launch.conditions.IfCondition(
-                launch.substitutions.LaunchConfiguration('use_microphone'))
+            condition=IfCondition(LaunchConfiguration('use_microphone'))
         ),
-        launch_ros.actions.Node(
+        Node(
             package='voice_interaction_robot',
             node_executable='voice_output',
             node_name='voice_output',
             output='screen',
             parameters=[
                 {
-                    'use_sim_time': launch.substitutions.LaunchConfiguration('use_sim_time')
+                    'use_sim_time': LaunchConfiguration('use_sim_time')
                 }
             ],
-            condition=launch.conditions.IfCondition(
-                launch.substitutions.LaunchConfiguration('use_speaker'))
+            condition=IfCondition(LaunchConfiguration('use_speaker'))
         ),
-        launch_ros.actions.Node(
+        Node(
             package='voice_interaction_robot',
             node_executable='audio_output',
             node_name='audio_output',
             output='screen',
             parameters=[
                 {
-                    'use_sim_time': launch.substitutions.LaunchConfiguration('use_sim_time')
+                    'use_sim_time': LaunchConfiguration('use_sim_time')
                 }
             ],
-            condition=launch.conditions.IfCondition(
-                launch.substitutions.LaunchConfiguration('use_speaker'))
+            condition=IfCondition(LaunchConfiguration('use_speaker'))
         ),
-        launch_ros.actions.Node(
+        Node(
             package='voice_interaction_robot',
             node_executable='voice_interaction',
             node_name='voice_interaction',
             output='screen',
-            additional_env={'PYTHONUNBUFFERED' : '1'},
+            additional_env={'PYTHONUNBUFFERED': '1'},
             parameters=[
                 {
-                    'use_sim_time': launch.substitutions.LaunchConfiguration('use_sim_time'),
-                    'use_polly': launch.substitutions.LaunchConfiguration('use_polly')
+                    'use_sim_time': LaunchConfiguration('use_sim_time'),
+                    'use_polly': LaunchConfiguration('use_polly')
                 },
             ],
             remappings={
@@ -128,29 +130,29 @@ def generate_launch_description():
                 '/voice_interaction/audio_output': '/audio_output'
             }.items()
         ),
-        launch_ros.actions.Node(
+        Node(
             package='voice_interaction_robot',
             node_executable='voice_command_translator',
             node_name='voice_command_translator',
             output='screen',
-            additional_env={'PYTHONUNBUFFERED' : '1'},
+            additional_env={'PYTHONUNBUFFERED': '1'},
             parameters=[
                 {
-                    'use_sim_time': launch.substitutions.LaunchConfiguration('use_sim_time')
+                    'use_sim_time': LaunchConfiguration('use_sim_time')
                 }
             ]
         ),
-        launch.actions.IncludeLaunchDescription(
-            launch.launch_description_sources.PythonLaunchDescriptionSource(
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
                 os.path.join(get_package_share_directory(
-                    'lex_node'), 'launch/lex.launch.py')
+                    'lex_node'), 'launch', 'lex.launch.py')
             ),
             launch_arguments={
-                'aws_region': launch.substitutions.LaunchConfiguration('aws_region'),
-                'config_file': get_package_share_directory('voice_interaction_robot') + '/config/lex_config.yaml',
-                'node_name': launch.substitutions.LaunchConfiguration('lex_node_name'),
-                'output': launch.substitutions.LaunchConfiguration('output'),
-                'user_id': launch.substitutions.LaunchConfiguration('user_id')
+                'aws_region': LaunchConfiguration('aws_region'),
+                'config_file': config_file_path,
+                'node_name': LaunchConfiguration('lex_node_name'),
+                'output': LaunchConfiguration('output'),
+                'user_id': LaunchConfiguration('user_id')
             }.items()
         )
     ])
