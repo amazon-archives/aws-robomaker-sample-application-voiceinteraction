@@ -1,13 +1,51 @@
-## ! DO NOT MANUALLY INVOKE THIS setup.py, USE CATKIN INSTEAD
-## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
+import os
+from glob import glob
+from setuptools import setup, find_packages
 
-from distutils.core import setup
-from catkin_pkg.python_setup import generate_distutils_setup
+package_name = 'voice_interaction_robot'
 
-# fetch values from package.xml
-setup_args = generate_distutils_setup(
-    packages=['voice_interaction_robot'],
-    package_dir={'': 'src'}
+setup(
+    name=package_name,
+    version='2.0.0',
+    package_dir={'': 'src'},
+    packages=find_packages(where='src'),
+    data_files=[
+        ('share/ament_index/resource_index/packages', ['resource/' + package_name]),
+        (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),
+        ('share/' + package_name + '/config', ['config/lex_config.yaml']),
+        ('share/' + package_name + '/config', ['config/VoiceInteractionRobot.json']),
+        ('share/' + package_name, ['package.xml']),
+        ('lib/' + package_name, ['scripts/audio_input.py']),
+        ('lib/' + package_name, ['scripts/text_input.py']),
+        (os.path.join('assets', package_name), glob('assets/*.wav')),
+    ],
+    install_requires=['setuptools'],
+    zip_safe=True,
+    author='AWS RoboMaker',
+    author_email='ros-contributions@amazon.com',
+    maintainer='AWS RoboMaker',
+    maintainer_email='ros-contributions@amazon.com',
+    keywords=['ROS'],
+    classifiers=[
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: Apache Software License',
+        'Programming Language :: Python',
+        'Topic :: Software Development',
+    ],
+    description=(
+        'AWS RoboMaker robot package that shows how to use a Turtlebot3 with Amazon Lex and Amazon Polly'
+    ),
+    license='Apache License, Version 2.0',
+    tests_require=['pytest'],
+    entry_points={
+        'console_scripts': [
+            'audio_output = voice_interaction_robot.audio_output:main',
+            'integration_test = voice_interaction_robot.test.integration_test:main',
+            'voice_command_translator = voice_interaction_robot.voice_command_translator:main',
+            'voice_input = voice_interaction_robot.voice_input:main',
+            'voice_interaction = voice_interaction_robot.voice_interaction:main',
+            'voice_output = voice_interaction_robot.voice_output:main',
+        ],
+    },
 )
 
-setup(**setup_args)

@@ -1,26 +1,30 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.5)
+
 project(voice_interaction_robot_msgs)
 
-find_package(catkin REQUIRED COMPONENTS
-        roscpp
-        std_msgs
-        diagnostic_msgs
-        message_generation
+# Default to C++14
+if(NOT CMAKE_CXX_STANDARD)
+    set(CMAKE_CXX_STANDARD 14)
+endif()
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
+find_package(ament_cmake REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(lex_common_msgs REQUIRED)
+find_package(builtin_interfaces REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
+
+set(msg_files
+        "msg/AudioData.msg"
+        "msg/FulfilledVoiceCommand.msg"
         )
 
-add_message_files(
-    DIRECTORY msg
-    FILES
-    FulfilledVoiceCommand.msg
-)
-
-generate_messages(
-        DEPENDENCIES
-        std_msgs
-        diagnostic_msgs
-)
-
-catkin_package(
-        CATKIN_DEPENDS
-        message_runtime
-)
+rosidl_generate_interfaces(${PROJECT_NAME}
+        ${msg_files}
+        DEPENDENCIES builtin_interfaces std_msgs lex_common_msgs
+        )
+        
+ament_export_dependencies(rosidl_default_runtime)
+ament_package()

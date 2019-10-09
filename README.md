@@ -9,7 +9,7 @@ _RoboMaker sample applications include third-party software licensed under open-
 
 ## Requirements
 
-- [ROS Kinetic](http://wiki.ros.org/kinetic/Installation/Ubuntu) / [ROS Melodic](http://wiki.ros.org/melodic/Installation/Ubuntu) - Other versions may work, however they have not been tested
+- [ROS2 Dashing](https://index.ros.org//doc/ros2/Installation/Dashing) - Other versions of ROS2 may work, however they have not been tested
 - [Colcon](https://colcon.readthedocs.io/en/released/user/installation.html) - Used for building and bundling the application. 
 
 ## AWS Account Setup
@@ -87,19 +87,19 @@ Launch the application with the following commands:
 - *Running Robot Application on a Robot*
     ```bash
     source robot_ws/install/local_setup.sh
-    roslaunch voice_interaction_robot deploy_voice_interaction.launch
+    ros2 launch voice_interaction_robot deploy_voice_interaction.launch.py
     ```
 
 - *Running Robot Application Elsewhere*
     ```bash
     source robot_ws/install/local_setup.sh
-    roslaunch voice_interaction_robot voice_interaction.launch
+    ros2 launch voice_interaction_robot voice_interaction.launch.py
     ```
 
 - *Running Simulation Application*
     ```bash
     source simulation_ws/install/local_setup.sh
-    roslaunch voice_interaction_simulation bookstore.launch
+    ros2 launch voice_interaction_simulation bookstore.launch.py
     ```
 
 ### Run Options
@@ -133,7 +133,7 @@ First, run the robot following the commands in the "Run" section. Then try some 
 
 ```bash
 source robot_ws/install/local_setup.sh
-robot_ws/src/voice_interaction_robot/scripts/text_input.py
+ros2 run voice_interaction_robot text_input.py
 ```
 
 Try the following inputs:
@@ -153,7 +153,7 @@ This should send a move command to the robot
 ```bash
 source robot_ws/install/local_setup.sh
 cd robot_ws/src/voice_interaction_robot/
-scripts/audio_input.py
+ros2 run voice_interaction_robot audio_input.py
 ```
 
 Once the script has loaded try the following inputs
@@ -262,10 +262,10 @@ scripts to move the robot around. First, open a RoboMaker terminal from the simu
 eval $AWS_ROBOMAKER_ROBOT_APPLICATION_SETUP
 
 # Run Text Input test script
-rosrun voice_interaction_robot text_input.py
+ros2 run voice_interaction_robot text_input.py
 
 # Run Audio Input test script
-rosrun voice_interaction_robot audio_input.py
+ros2 run voice_interaction_robot audio_input.py
 ```
 
 ## AWS ROS Packages used by this Sample

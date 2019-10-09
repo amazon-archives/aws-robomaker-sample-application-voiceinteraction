@@ -1,2 +1,2 @@
 string intent_name
-diagnostic_msgs/KeyValue[] slots
+lex_common_msgs/KeyValue[] slots
