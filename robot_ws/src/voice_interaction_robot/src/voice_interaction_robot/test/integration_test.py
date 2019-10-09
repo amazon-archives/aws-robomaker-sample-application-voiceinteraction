@@ -1,14 +1,3 @@
-import os
-import time
-
-import numpy as np
-import rclpy
-from rclpy.node import Node
-
-from voice_interaction_robot_msgs.msg import AudioData
-from geometry_msgs.msg import Twist, Vector3
-from std_msgs.msg import String
-from ament_index_python.packages import get_package_prefix
 """
  Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
@@ -26,17 +15,21 @@ from ament_index_python.packages import get_package_prefix
  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
+import os
+import time
 
-"""
-    This script runs a series of integration tests for the voice_interaction node. 
-    It can be launched with the integration_test launch file and it will output
-    how many tests are to be run and the results for each test. 
-"""
+import numpy as np
+import rclpy
+from rclpy.node import Node
 
+from voice_interaction_robot_msgs.msg import AudioData
+from geometry_msgs.msg import Twist, Vector3
+from std_msgs.msg import String
+from ament_index_python.packages import get_package_prefix
 
 WAV_HEADER_LENGTH = 24
 AUDIO_ASSETS_DIR = os.path.join(get_package_prefix(
-    'voice_interaction_robot'), "assets", "voice_interaction_robot") 
+    'voice_interaction_robot'), "assets", "voice_interaction_robot")
 AUDIO_EXTENSION = ".wav"
 
 
@@ -120,7 +113,8 @@ class VoiceInteractionIntegrationTest(Node):
             String, self.text_input_topic, 5)
         self.audio_input_publisher = self.create_publisher(
             AudioData, self.audio_input_topic, 5)
-        self.wake_publisher = self.create_publisher(String, self.wake_word_topic, 5)
+        self.wake_publisher = self.create_publisher(
+            String, self.wake_word_topic, 5)
         self.create_subscription(Twist, "/cmd_vel", self.save_cmd_vel, 5)
 
     def run_tests(self):
@@ -168,7 +162,7 @@ class VoiceInteractionIntegrationTest(Node):
         required_services = set([
             '/lex_conversation'
         ])
- 
+
         while not required_services.issubset([s[0] for s in self.get_service_names_and_types()]):
             self.get_logger().info(f"Waiting on services to launch...")
             time.sleep(0.1)
