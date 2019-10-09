@@ -38,7 +38,7 @@ from std_msgs.msg import String
 from voice_interaction_robot_msgs.msg import AudioData
 
 WAV_HEADER_LENGTH = 24
-DEFAULT_ASSETS_DIR = get_package_prefix('voice_interaction_robot') + "/assets/voice_interaction_robot/"
+DEFAULT_ASSETS_DIR = os.path.join(get_package_prefix('voice_interaction_robot'), "assets", "voice_interaction_robot")
 DEFAULT_ASSETS_EXT = ".wav"
 
 class AudioInput(Node):
@@ -100,7 +100,7 @@ class AudioInput(Node):
         return any(wake_word in command for wake_word in self.wake_words)
 
     def process_filepath(self, filepath):
-        full_path = self.current_directory + "/" + filepath + self.default_extension
+        full_path = os.path.join(self.current_directory, filepath + self.default_extension)
         audio = self.load_wav_file(full_path)
         if audio is not None:
             self.play_audio_data(audio)
