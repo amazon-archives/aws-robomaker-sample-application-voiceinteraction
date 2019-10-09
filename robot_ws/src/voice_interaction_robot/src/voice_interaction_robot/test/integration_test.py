@@ -1,3 +1,14 @@
+import os
+import time
+
+import numpy as np
+import rclpy
+from rclpy.node import Node
+
+from voice_interaction_robot_msgs.msg import AudioData
+from geometry_msgs.msg import Twist, Vector3
+from std_msgs.msg import String
+from ament_index_python.packages import get_package_prefix
 """
  Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
@@ -21,25 +32,25 @@
     It can be launched with the integration_test launch file and it will output
     how many tests are to be run and the results for each test. 
 """
-import time
-import os
 
-import numpy as np
-import rclpy
-from rclpy.node import Node
-from ament_index_python.packages import get_package_prefix
-
-from std_msgs.msg import String
-from geometry_msgs.msg import Twist, Vector3
-from voice_interaction_robot_msgs.msg import AudioData
 
 WAV_HEADER_LENGTH = 24
-AUDIO_ASSETS_DIR = get_package_prefix('voice_interaction_robot') + "/assets/voice_interaction_robot/"
+AUDIO_ASSETS_DIR = os.path.join(get_package_prefix(
+    'voice_interaction_robot'), "assets", "voice_interaction_robot") 
 AUDIO_EXTENSION = ".wav"
 
+
 class IntegrationTest():
+    """Runs integration tests for text and audio commands
+
+    This runner launches the voice_interaction application and sends text
+    commands and audio files to the /text_input and /voice_input topics. 
+    It then listens to /cmd_vel to ensure the commands are translated 
+    into the correct robot movements. 
+    """
+    # After each audio command is sent wait this many seconds before sending the next one
     wait_between_audio_commands = 1
-    
+
     def __init__(self, text_input_publisher, audio_input_publisher, test_type, commands, expected_result):
         self.text_input_publisher = text_input_publisher
         self.audio_input_publisher = audio_input_publisher
@@ -56,24 +67,24 @@ class IntegrationTest():
             'audio': self.run_audio_input_test
         }
         test_runners[self.test_type]()
-        
+
     def run_text_input_test(self):
         for command in self.commands:
             self.send_text(command)
-            
+
     def send_text(self, text):
         self.text_input_publisher.publish(String(data=text))
-        
+
     def run_audio_input_test(self):
         for filename in self.commands:
             self.send_audio(filename)
             time.sleep(self.wait_between_audio_commands)
-        
+
     def send_audio(self, filename):
-        full_path = AUDIO_ASSETS_DIR + "/" + filename + AUDIO_EXTENSION
+        full_path = os.path.join(AUDIO_ASSETS_DIR, filename + AUDIO_EXTENSION)
         raw_data = self.load_wav_file(full_path)
         if raw_data is not None:
-            audio_data = raw_data.tolist() 
+            audio_data = raw_data.tolist()
             self.audio_input_publisher.publish(AudioData(data=audio_data))
 
     def load_wav_file(self, filepath):
@@ -90,7 +101,8 @@ class IntegrationTest():
             logger.info(f"result:{result}")
             logger.info(f"expected result:{self.expected_result}")
             return False
-        
+
+
 class VoiceInteractionIntegrationTest(Node):
     wake_words = ("jarvis", "turtlebot")
     last_cmd_vel = None
@@ -98,18 +110,23 @@ class VoiceInteractionIntegrationTest(Node):
     test_sleep_time = 2
     tests = []
     max_retries_per_test = 1
-    
+    text_input_topic = "/text_input"
+    audio_input_topic = "/audio_input"
+    wake_word_topic = "/wake_word"
+
     def __init__(self):
         super().__init__("integration_test")
-        self.text_input_publisher = self.create_publisher(String, "/text_input", 5)
-        self.audio_input_publisher = self.create_publisher(AudioData, "/audio_input", 5)
-        self.wake_publisher = self.create_publisher(String, "/wake_word", 5)
+        self.text_input_publisher = self.create_publisher(
+            String, self.text_input_topic, 5)
+        self.audio_input_publisher = self.create_publisher(
+            AudioData, self.audio_input_topic, 5)
+        self.wake_publisher = self.create_publisher(String, self.wake_word_topic, 5)
         self.create_subscription(Twist, "/cmd_vel", self.save_cmd_vel, 5)
-        
+
     def run_tests(self):
         self.wait_for_voice_interaction_nodes()
         self.wait_for_voice_interaction_services()
-        # self.wait_for_voice_interaction_node_to_subscribe_to_topic()
+        self.wait_for_voice_interaction_node_to_subscribe_to_topic()
         self.load_text_input_tests()
         self.load_audio_input_tests()
         self.get_logger().info(f"Total tests: {len(self.tests)}")
@@ -117,7 +134,7 @@ class VoiceInteractionIntegrationTest(Node):
         self.wake_robot(2.0)
         for test in self.tests:
             self.run_test(test)
-        
+
     def run_test(self, test):
         self.wake_robot()
         retry_count = 0
@@ -135,28 +152,41 @@ class VoiceInteractionIntegrationTest(Node):
                 retry_count += 1
 
         self.get_logger().info("test failed")
-        
+
     def wait_for_voice_interaction_nodes(self):
         required_nodes = set([
-            '/lex_node', 
-            '/voice_interaction', 
-            '/voice_command_translator'
+            'lex_node',
+            'voice_interaction',
+            'voice_command_translator'
         ])
         time.sleep(1)
-        # while not required_nodes.issubset(rosnode.get_node_names()):
-            # time.sleep(0.1)
-            
+        while not required_nodes.issubset(self.get_node_names()):
+            self.get_logger().info(f"Waiting on nodes to launch...")
+            time.sleep(0.1)
+
     def wait_for_voice_interaction_services(self):
         required_services = set([
-            '/lex_node/lex_conversation'
+            '/lex_conversation'
         ])
-        time.sleep(1)
-        # while not required_services.issubset(rosservice.get_service_list()):
-            # time.sleep(0.1)
-            
+ 
+        while not required_services.issubset([s[0] for s in self.get_service_names_and_types()]):
+            self.get_logger().info(f"Waiting on services to launch...")
+            time.sleep(0.1)
+
     def wait_for_voice_interaction_node_to_subscribe_to_topic(self):
-        rostopic.wait_for_subscriber(self.text_input_publisher, self.vinode_start_timeout)
-        rostopic.wait_for_subscriber(self.wake_publisher, self.vinode_start_timeout)
+        self.wait_for_subscriber(
+            self.text_input_topic, self.vinode_start_timeout)
+        self.wait_for_subscriber(
+            self.audio_input_topic, self.vinode_start_timeout)
+        self.wait_for_subscriber(
+            self.wake_word_topic, self.vinode_start_timeout)
+
+    def wait_for_subscriber(self, topic_name, timeout):
+        start = time.time()
+        while self.count_subscribers(topic_name) < 1:
+            if time.time() > start + timeout:
+                raise TimeoutError(f"Timed out waiting for subscribers to topic {topic_name}")
+            time.sleep(0.1)
 
     def create_twist(self, linear, angular):
         return Twist(
@@ -171,44 +201,48 @@ class VoiceInteractionIntegrationTest(Node):
                 z=float(angular[2])
             )
         )
-            
+
     def load_text_input_tests(self):
         text_input_tests = [
-            (["move", "forward", "5"], self.create_twist((5,0,0), (0,0,0))),
-            (["move", "backwards", "0.2"], self.create_twist((-0.2,0,0), (0,0,0))),
-            (["move forward 2"], self.create_twist((2,0,0), (0,0,0))),
-            (["rotate left 10"], self.create_twist((0,0,0), (0,0,10))),
-            (["rotate", "clockwise",  "5"], self.create_twist((0,0,0), (0,0,-5))),
-            (["stop"], self.create_twist((0,0,0), (0,0,0))),
-            (["halt"], self.create_twist((0,0,0), (0,0,0)))
+            (["move", "forward", "5"], self.create_twist((5, 0, 0), (0, 0, 0))),
+            (["move", "backwards", "0.2"],
+             self.create_twist((-0.2, 0, 0), (0, 0, 0))),
+            (["move forward 2"], self.create_twist((2, 0, 0), (0, 0, 0))),
+            (["rotate left 10"], self.create_twist((0, 0, 0), (0, 0, 10))),
+            (["rotate", "clockwise",  "5"],
+             self.create_twist((0, 0, 0), (0, 0, -5))),
+            (["stop"], self.create_twist((0, 0, 0), (0, 0, 0))),
+            (["halt"], self.create_twist((0, 0, 0), (0, 0, 0)))
         ]
         for test in text_input_tests:
             (command, expected_result) = test
-            integration_test = IntegrationTest(self.text_input_publisher, self.audio_input_publisher, 
-                "text", command, expected_result)
+            integration_test = IntegrationTest(self.text_input_publisher, self.audio_input_publisher,
+                                               "text", command, expected_result)
             self.tests.append(integration_test)
-        
+
     def load_audio_input_tests(self):
         audio_input_tests = [
-            (["move-forward-5"], self.create_twist((5,0,0), (0,0,0))),
-            (["turn-clockwise-3"], self.create_twist((0,0,0), (0,0,-3))),
-            (["stop"], self.create_twist((0,0,0), (0,0,0))),
-            (["turn", "counterclockwise", "10"], self.create_twist((0,0,0), (0,0,10))),
-            (["rotate", "clockwise", "5"], self.create_twist((0,0,0), (0,0,-5))),
+            (["move-forward-5"], self.create_twist((5, 0, 0), (0, 0, 0))),
+            (["turn-clockwise-3"], self.create_twist((0, 0, 0), (0, 0, -3))),
+            (["stop"], self.create_twist((0, 0, 0), (0, 0, 0))),
+            (["turn", "counterclockwise", "10"],
+             self.create_twist((0, 0, 0), (0, 0, 10))),
+            (["rotate", "clockwise", "5"], self.create_twist((0, 0, 0), (0, 0, -5))),
         ]
         for test in audio_input_tests:
             (command, expected_result) = test
             integration_test = IntegrationTest(self.text_input_publisher, self.audio_input_publisher,
-                "audio", command, expected_result)
+                                               "audio", command, expected_result)
             self.tests.append(integration_test)
-            
+
     def wake_robot(self, post_wake_sleep=0.1):
         self.wake_publisher.publish(String(data=self.wake_words[0]))
         time.sleep(post_wake_sleep)
-        
+
     def save_cmd_vel(self, data):
         self.get_logger().info("Received new cmd_vel: {}".format(data))
         self.last_cmd_vel = data
+
 
 def main():
     rclpy.init()

@@ -118,7 +118,8 @@ def generate_launch_description():
             node_executable='voice_interaction',
             node_name='voice_interaction',
             output='screen',
-            additional_env={'PYTHONUNBUFFERED': '1'},
+            # Stream logs to terminal, otherwise they buffer and often only show after program is killed. 
+            additional_env={'PYTHONUNBUFFERED': '1'}, 
             parameters=[
                 {
                     'use_sim_time': LaunchConfiguration('use_sim_time'),

@@ -31,6 +31,8 @@ def generate_launch_description():
             package='voice_interaction_robot',
             node_executable='integration_test',
             node_name='integration_test',
+            # Stream logs to terminal, otherwise they buffer and often only show after program is killed. 
+            additional_env={'PYTHONUNBUFFERED': '1'}, 
             output='screen'
         ),
         IncludeLaunchDescription(
