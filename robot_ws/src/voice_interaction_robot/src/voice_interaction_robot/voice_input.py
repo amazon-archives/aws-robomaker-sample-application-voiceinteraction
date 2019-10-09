@@ -64,9 +64,7 @@ class VoiceInput(Node):
 
     def listen(self):
         self.open_stream()
-
         self.get_logger().info("%s listening" % self.node_name)
-
         current_audio = ''
         chunks_per_second = int(self.audio_rate / self.chunk_size)
         sliding_window = deque(maxlen=self.silence_limit_seconds * chunks_per_second)
@@ -101,7 +99,11 @@ class VoiceInput(Node):
                 prev_audio.append(latest_audio_data)
 
     def audio_int(self):
-        self.get_record_device_index()
+        record_device_index = self.get_audio_device_index('record')
+        if record_device_index:
+            self.input_device_index = record_device_index
+        else:
+            self.get_logger().info("Falling back to default recording device")
         self.determine_silence_threshold()
 
     def determine_silence_threshold(self):
@@ -126,20 +128,19 @@ class VoiceInput(Node):
         self.get_logger().info("Silence threshold set to %d " % self.silence_threshold)
         self.close_stream()
 
-    def get_record_device_index(self):
-        """ Finds the audio device named 'record' configured in ~/.asoundrc.
+    def get_audio_device_index(self, device_name):
+        """ Finds the audio device "device_name" configured in ~/.asoundrc.
             If this device is not found, returns None and pyaudio will use
             your machines default device
         """
-
-        self.get_logger().info("Attempting to find device named 'record'")
+        self.get_logger().info(f"Attempting to find device named {device_name}")
         for i in range(self.p.get_device_count()):
             device = self.p.get_device_info_by_index(i)
-            if device['name'] == 'record':
-                self.get_logger().info("Found device 'record' at index %d" % i)
-                self.input_device_index = i
-                return
-        self.get_logger().info("Could not find device named 'record', falling back to default recording device")
+            if device['name'] == device_name:
+                self.get_logger().info(f"Found device '{device_name}' at index %d" % i)
+                return i
+        self.get_logger().info("Could not find device named {device_name}")
+        return None
 
 
 def main():
