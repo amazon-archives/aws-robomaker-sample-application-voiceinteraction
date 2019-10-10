@@ -79,6 +79,8 @@ def generate_launch_description():
             node_executable='voice_input',
             node_name='voice_input',
             output='screen',
+            # Stream logs to terminal, otherwise they buffer and often only show after program is killed. 
+            additional_env={'PYTHONUNBUFFERED': '1'}, 
             parameters=[
                 {
                     'use_sim_time': LaunchConfiguration('use_sim_time')
@@ -91,21 +93,11 @@ def generate_launch_description():
         ),
         Node(
             package='voice_interaction_robot',
-            node_executable='voice_output',
-            node_name='voice_output',
-            output='screen',
-            parameters=[
-                {
-                    'use_sim_time': LaunchConfiguration('use_sim_time')
-                }
-            ],
-            condition=IfCondition(LaunchConfiguration('use_speaker'))
-        ),
-        Node(
-            package='voice_interaction_robot',
             node_executable='audio_output',
             node_name='audio_output',
             output='screen',
+            # Stream logs to terminal, otherwise they buffer and often only show after program is killed. 
+            additional_env={'PYTHONUNBUFFERED': '1'}, 
             parameters=[
                 {
                     'use_sim_time': LaunchConfiguration('use_sim_time')

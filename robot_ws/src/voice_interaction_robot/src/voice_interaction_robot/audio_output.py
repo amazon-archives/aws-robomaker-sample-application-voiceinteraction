@@ -29,7 +29,7 @@ class AudioOutput(Node):
         self.get_output_device_index()
 
     def play_audio_data(self, request):
-        audio_data = request.data
+        audio_data = bytes(request.data)
         p = pyaudio.PyAudio()
         audio_format = pyaudio.paInt16
         chunk_size = 512
@@ -42,6 +42,8 @@ class AudioOutput(Node):
                         output_device_index=self.output_device_index,
                         frames_per_buffer=chunk_size)
         stream.write(audio_data)
+        stream.stop_stream()
+        stream.close()
 
     def get_output_device_index(self):
         """ Finds the audio device named 'play' configured in ~/.asoundrc.

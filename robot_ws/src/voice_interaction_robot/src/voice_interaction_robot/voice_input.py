@@ -65,7 +65,7 @@ class VoiceInput(Node):
     def listen(self):
         self.open_stream()
         self.get_logger().info("%s listening" % self.node_name)
-        current_audio = ''
+        current_audio = b''
         chunks_per_second = int(self.audio_rate / self.chunk_size)
         sliding_window = deque(maxlen=self.silence_limit_seconds * chunks_per_second)
         prev_audio = deque(maxlen=self.previous_audio_seconds * chunks_per_second)
@@ -82,17 +82,17 @@ class VoiceInput(Node):
             elif started:
                 self.get_logger().info("Finished")
 
-                all_audio_data = ''.join(prev_audio) + current_audio
+                all_audio_data = b''.join(prev_audio) + current_audio
                 self.stream.stop_stream()
 
                 audio_bitstream = np.fromstring(all_audio_data, np.uint8)
                 audio = audio_bitstream.tolist()
-                self.audio_publisher.publish(audio)
+                self.audio_publisher.publish(AudioData(data=audio))
 
                 started = False
                 sliding_window.clear()
                 prev_audio.clear()
-                current_audio = ''
+                current_audio = b''
                 self.stream.start_stream()
                 self.get_logger().info("Listening ...")
             else:
