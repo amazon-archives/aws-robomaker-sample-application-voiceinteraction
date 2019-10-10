@@ -18,19 +18,19 @@ env:
   - GH_USER_NAME="travis-ci"
   - GH_USER_EMAIL="travis@travis-ci.org"
   - AWS_DEFAULT_REGION=us-west-2
-  - secure: NvVI+SvtSArAJ10RzMQUztjMg8oUzXUMhilE5uO5CXTekf034ccH1dWCkex5cW9AOqQShRa3gErOdibOQIHN+jhCbGNfLCplcHImhJsE6PtUN0M5yO9R1onzIE9/G6p5/MRUYB0EnwvFoqL8tGNRP0IYf9xbUAA8ZirnU70d4j8GYNpIg/hMRqSKs7IdeGQn2XTRG3dUKDDCtGnf+KkcZArPmUXDj8ejs7mD6crq8w7zMtI6K7RKFSU8xST9JH2fyM2cl+tRYJcdsZWTvvJIBZP0IWxIE15R7G/AIRhPNK3ScN8VVQuebwg/Y+Jbu4YAM7PY34/4l/3+W1u2GcbmX7sZQC5V7SfwnLhk3kJJy75VPh9R7y1OxZFKhoP0wRAJe/7CS9lVL1iJP6h/9Nrrgdjy4mTUo1HNLk5kLJBUxo6YQ0U9ZdKjFV0salwT2BzUuner7dwbhxuzBx2OlVBGui+/upZH7aXc1o67fvCkUI499bFI8yNXG2adrUVX5ltKSAdSSeQAPhyweb9RzwQvYJbwlB5ZT+056rRe2jd60rMCutU80Zpow2W9B3QnYJbahshQSWDEGlmS7Y3dMh0jwTxO8zd/2e7KLn+VF5hAmzmPC9GLJZWHuPc2B7xffxSwGHuP6WVhzVVCFhCTwRp/Gak2Bt2o3/h1WzevqlXt56U=
-  - secure: fOHPgDKA0atQSMquccxXitvGOU+YsowapMploddmgG/jF+uSeeFbBo6Q0mu1IdMkuzXr0w08dpsU6QFylvt/EGINNMSZSLhc072gLHsWpLbKIPJSY9Jm1lpqRUmxti9n7RYmt7Z2AUH/dG/nDJYlWO6ajDY30TOS8wo9ZG34CRN6tuHL9kXbey35qoZDc35iECuN0Ury0HTaAyL9ymivev/mpLGALe4zrsUk0in+pyAMabQCoBwp+qHerNqXeUrjkdfR7+WYql8yHs7tCyDlJmnqTigMuu1HzOAFH1pZ95EQrwseZF6bnVMtWCgrxxFKlXF371+tyf9U/zkkOFtCg7DcUQbMruJK8hJv5v0v7/dnX4aSE8Fw4/Io0ZbmnrRLW80tOLAginbEb/nlBOzzprA2QdeYQ4nY8fhALj8r/JHk5a0i3qVTZ0OC1avXyqSs4TnDyBKQZ6eYATdmvsdOXqwIkS3ELOiLDfbCfpv5OdrF29WqvNL9oT6hXzPWfwMzhd6AqvwaUJNqZjUiM9jJ2qt2+mj79o474lcAfOExiAmojTnSOu2ui+Rp8AC8c0cARpVrz+8jbYkZFzL9En/E7j0I/pKookzHJMH/tgnEkXP4fuJ8S88ICE1xClOnMpVbgBeQs5yiaE/Sfua/fu3pCY6pUXwop96KBleSCNu2Sxc=
+  - secure: Nv2U7OwkwP5BaR6VB6QzFRZGkakz3UKfE8GsjOpWJZF7YRBBWo/1r4yWwLBYaJf8fhfSBpOcZ9nhHGj3YSjcEtqkcf5t4t3OorjmOMu375dvJgtUTKJaiO6gALBqFwpXhaNuQl3jALQdV/GxFEitxTto0r+WkAsPXA35W5ZisNBwjSkLitr/tE72OW6Daf+eKQpsIMmQVzAK8kmFL2NdO8KkCuYfDkR5Omw8sTHwpuMyeGSpES3d1NW3lR5U9Xq55PWUEPCSXQopTZgMWWb1S61bcjWjlj0Z7Ybf27jB8bG+MtI3BEzAiE5FsaKFwbj8vqaprK+mXZMqYobOnWAHNhbyVSsKYv+vyByKvvxWIQW0JTYRLGvKArvscaf/yqVqZqQvH72Kxe1kFLp2Ym2I/y7IzM42wgJG3CovRYe2PTvIZCSvQTKTARr8CJmM6u8GIAxVsGShVq6xqHi/cuPMN1xynkVo1gGMkD9u/bEiV1geXZb7vMtuiYDYMA52vkfa4ygxiuoR6Np5Ne+96F78vA2KuvdDK1f/seBDb2Lhu29YIDOH+1rdRUhH0wWkgi1GJUrsVivu+Bn4XC5zyNcbvvlLBvItwm6t81kwJ7vBWKZOJ7ebzFlW/m2fjDAzx9zzTMnW5+1mzIoDYWnBR22UT+Mu6ZiX+Da2i5NV1IAfxmc=
+  - secure: aZiT84lLiSa4LHuVemJhBhYJb5DrQLAeO9gw4yp8ZqfHcMkjPiYJdedXqvLyux/lE/sMGsGbN+xU2D2jidbWjWBBusey/HomNdN/cNS2Mk0rBydnIjlusKjB3kTLLsjToUpIjXQnXYFxY+rf2Zi8Nr382Qv+a4HALkOjGjph+cYCGaHi4WE7S7Qi7Vs/ANOMtoGHdpuYOLO2gd7tjHt+Z6MyUCMWp3MIba0PTp635Ot0XiWuPZG7wwiTN4377tTKea94ETWGY8kAOV5H6xRcNgz2qziSOkkXQSU0UlOBhQRHY8dCvFh0hzh1WbRSS3Z0hl2aWtljai5WCO/xyLXcWpHX1WYpF6Ke6H5zvyPzAOejP8kTT/+xdqKfSMOv8C3LIBWpTNMdVatLxy74W7lzjnkQzhrnCU16ZaR0Zu7BLm8HWROb+zXnAkr2XRec0tvG722pFuKa1TTBykvnzVr+kAuFK9OO1ZcQ2t1nvhLC9J6d21C9j9i2PmlWmhtF1UKpgMfkcnib2e/LCVo0y483k7w764w+riMXJCJdHxSzL6zeq1pJM0SySFxGRkFDHFJAE6gfmSMcO0TZkJiDN4xYPTNztNPC8VpBi2O0tsaUx89YPskWfXGOUsjJd0dpX6c0iZxWbkPQhfXpMsOo2oUH5mD65+rMoZnW5BhVcvTvqcQ=
 before_install:
 - pip install --user awscli
 install:
 - git clone https://github.com/aws-robotics/travis-scripts.git .ros_ci
 script:
-- . .ros_ci/add_tag.sh && set +e
+- ". .ros_ci/add_tag.sh && set +e"
 - while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &
 - ".ros_ci/ce_build.sh"
 - kill %1
 before_deploy:
-- . .ros_ci/before_deploy.sh && set +e
+- ". .ros_ci/before_deploy.sh && set +e"
 deploy:
 - provider: s3
   access_key_id: "$AWS_ACCESS_KEY_ID"
@@ -50,10 +50,10 @@ jobs:
   - stage: Build & Bundle
     env: WORKSPACES="simulation_ws" UPLOAD_SOURCES="false"
   - stage: Upload sources
-    script: . .ros_ci/add_tag.sh && .ros_ci/prepare_sources_to_upload.sh && set +e
+    script: ". .ros_ci/add_tag.sh && .ros_ci/prepare_sources_to_upload.sh && set +e"
     env: WORKSPACES="robot_ws simulation_ws"
   - stage: Deploy
-    script: . .ros_ci/add_tag.sh && set +e
+    script: ". .ros_ci/add_tag.sh && set +e"
     before_deploy: export APP_MANIFEST_REPO=AppManifest-${SA_NAME}-${ROS_DISTRO}-gazebo${GAZEBO_VERSION}
     deploy:
     - provider: script
