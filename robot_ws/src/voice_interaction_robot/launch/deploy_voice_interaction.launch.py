@@ -30,7 +30,7 @@ def generate_launch_description():
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 os.path.join(get_package_share_directory(
-                    'turtlebot3_bringup'), 'launch', 'turtlebot3_robot.launch.py')
+                    'turtlebot3_bringup'), 'launch', 'robot.launch.py')
             )
         ),
         IncludeLaunchDescription(
