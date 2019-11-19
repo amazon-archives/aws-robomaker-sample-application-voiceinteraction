@@ -317,7 +317,7 @@ ros2 run voice_interaction_robot audio_input.py
 
 ## License
 
-MIT-0 - See LICENSE.txt for further information
+MIT-0 - See LICENSE for further information
 
 ## How to Contribute
 
