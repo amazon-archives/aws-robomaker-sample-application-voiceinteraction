@@ -1,6 +1,6 @@
 # AWS RoboMaker Sample Application - Voice Interaction
 
-This sample application demonstrates a robot that has voice controls via Amazon Lex, 
+This sample application demonstrates a robot that has voice controls via Amazon Lex,
 and can speak up if it encounters trouble using Amazon Polly.
 
 Keywords: Robot Voice Interaction, AWS, Lex, Polly
@@ -10,10 +10,10 @@ _RoboMaker sample applications include third-party software licensed under open-
 ## Requirements
 
 - [ROS2 Dashing](https://index.ros.org//doc/ros2/Installation/Dashing) - Other versions of ROS2 may work, however they have not been tested
-- [Colcon](https://colcon.readthedocs.io/en/released/user/installation.html) - Used for building and bundling the application. 
+- [Colcon](https://colcon.readthedocs.io/en/released/user/installation.html) - Used for building and bundling the application.
 
 ## AWS Account Setup
-	 
+
 ### AWS Credentials
 You will need to create an AWS Account and configure the credentials to be able to communicate with AWS services. You may find [AWS Configuration and Credential Files](https://docs.aws.amazon.com/cli/latest/userguide/cli-config-files.html) helpful.
 
@@ -36,7 +36,7 @@ You can find instructions for creating a new IAM Policy [here](https://docs.aws.
       "Effect": "Allow",
       "Action": [
         "lex:PostContent",
-        "lex:PostText", 
+        "lex:PostText",
         "polly:SynthesizeSpeech"
       ],
       "Resource": "*"
@@ -45,7 +45,7 @@ You can find instructions for creating a new IAM Policy [here](https://docs.aws.
 }
 ```
 
-## Build 
+## Build
 
 ### Pre-build commands
 
@@ -72,15 +72,15 @@ rosdep install --from-paths src --ignore-src -r -y
 colcon build
 ```
 
-## Run 
+## Run
 
-First, you must create a LexBot by importing the JSON file `robot_ws/src/voice_interaction_robot/config/VoiceInteractionRobot.json` into Lex.  
+First, you must create a LexBot by importing the JSON file `robot_ws/src/voice_interaction_robot/config/VoiceInteractionRobot.json` into Lex.
 You can read detailed instructions on how to import [here](https://docs.aws.amazon.com/lex/latest/dg/import-from-lex.html).
 
-After the import is complete you must build the bot, and then publish it to an alias. 
+After the import is complete you must build the bot, and then publish it to an alias.
 
-Once the bot has been built and published to an alias, edit the file `robot_ws/src/voice_interaction_robot/config/lex_config.yaml` 
-changing the bot_name and bot_alias variables to the bot you published in the Lex console. 
+Once the bot has been built and published to an alias, edit the file `robot_ws/src/voice_interaction_robot/config/lex_config.yaml`
+changing the bot_name and bot_alias variables to the bot you published in the Lex console.
 
 Launch the application with the following commands:
 
@@ -106,10 +106,10 @@ Launch the application with the following commands:
 
 You can set the following environment variables to configure your robot:
 
-- `ROS_AWS_REGION` - Set the AWS region of the Lex bot you are connecting to. Defaults to the value of `aws_client_configuration.region` in `config/lex_config.yaml` if unset. 
-- `LEX_USER_ID` - Set the UserID used when talking to the Lex bot. This is useful if you have multiple robots talking to the same Lex bot at the same time, as Lex will error if you send multiple commands using the same UserID to the same Lex bot at the same time. Defaults to the value of `lex_configuration.user_id` in `config/lex_config.yaml` if unset.  
+- `ROS_AWS_REGION` - Set the AWS region of the Lex bot you are connecting to. Defaults to the value of `aws_client_configuration.region` in `config/lex_config.yaml` if unset.
+- `LEX_USER_ID` - Set the UserID used when talking to the Lex bot. This is useful if you have multiple robots talking to the same Lex bot at the same time, as Lex will error if you send multiple commands using the same UserID to the same Lex bot at the same time. Defaults to the value of `lex_configuration.user_id` in `config/lex_config.yaml` if unset.
 
-## Test 
+## Test
 
 First, run the robot following the commands in the "Run" section. Then try some of the possible ways to test below.
 
@@ -120,9 +120,9 @@ First, run the robot following the commands in the "Run" section. Then try some 
     - turtlebot
 - Move:
     - move
-    - go 
+    - go
 - Turn:
-    - rotate 
+    - rotate
     - turn
 - Stop:
     - stop
@@ -165,24 +165,24 @@ clockwise
 2
 ```
 
-This will tell the robot to turn clockwise at a speed of "2". 
+This will tell the robot to turn clockwise at a speed of "2".
 
-This loads .wav files from the `robot_ws/src/voice_interaction_robot/assets` directory and plays them to the robot. 
+This loads .wav files from the `robot_ws/src/voice_interaction_robot/assets` directory and plays them to the robot.
 You can type the name of any of the audio files in this `assets` directory, or create your own via the commands in the "Creating Audio" section of this README.
 
 #### Testing on a Robot
 See the "Run" section for launching this sample application on a robot.
 
-The microphone will be listening by default via the `audio_input` node however this package contains no node to send the wake command to the robot, and the robot will not send any audio to lex until it is awoken. 
+The microphone will be listening by default via the `audio_input` node however this package contains no node to send the wake command to the robot, and the robot will not send any audio to lex until it is awoken.
 
-To wake the robot up publish a message to the `/wake_word` topic with: `rostopic pub /wake_word std_msgs/String "wake"` or you can run the audio_input.py or text_input.py scripts on the robot and wake it using them. 
+To wake the robot up publish a message to the `/wake_word` topic with: `rostopic pub /wake_word std_msgs/String "wake"` or you can run the audio_input.py or text_input.py scripts on the robot and wake it using them.
 
-## Troubleshooting 
+## Troubleshooting
 
 #### Audio Recording not working
 
-Run `arecord -l` on your robot, which will list all recording devices connected to your robot. 
-If no devices are listed there's an issue with your microphone not being detected by the robot. 
+Run `arecord -l` on your robot, which will list all recording devices connected to your robot.
+If no devices are listed there's an issue with your microphone not being detected by the robot.
 
 If a device is present then create the file `~/.asoundrc` with the following settings:
 
@@ -199,8 +199,8 @@ Replace `<CARD_ID>` and `<DEVICE_ID>` with the card number and device number lis
 
 #### Audio Output not working
 
-Run `aplay -l` on your robot, which will list all recording devices connected to your robot. 
-If no devices are listed there's an issue with your speakers not being detected by the robot. 
+Run `aplay -l` on your robot, which will list all recording devices connected to your robot.
+If no devices are listed there's an issue with your speakers not being detected by the robot.
 
 If a device is present then create the file `~/.asoundrc` with the following settings:
 
@@ -225,7 +225,7 @@ aws polly synthesize-speech --output-format pcm --sample-rate 16000 --voice-id J
 
 ## Using this sample with RoboMaker
 
-You first need to install colcon-ros-bundle. Python 3.5 or above is required. 
+You first need to install colcon-ros-bundle. Python 3.5 or above is required.
 
 ```bash
 pip3 install colcon-ros-bundle
@@ -245,16 +245,16 @@ source install/local_setup.sh
 colcon bundle
 ```
 
-This produces the artifacts `robot_ws/bundle/output.tar` and `simulation_ws/bundle/output.tar` respectively. 
+This produces the artifacts `robot_ws/bundle/output.tar` and `simulation_ws/bundle/output.tar` respectively.
 
-You'll need to upload these to an s3 bucket, then you can use these files to 
-[create a robot application](https://docs.aws.amazon.com/robomaker/create-robot-application.html),  
-[create a simulation application](https://docs.aws.amazon.com/robomaker/create-simulation-application.html), 
-and [create a simulation job](https://docs.aws.amazon.com/robomaker/create-simulation-job.html) in RoboMaker.
+You'll need to upload these to an s3 bucket, then you can use these files to
+[create a robot application](https://docs.aws.amazon.com/robomaker/latest/dg/create-robot-application.html),
+[create a simulation application](https://docs.aws.amazon.com/robomaker/latest/dg/create-simulation-application.html),
+and [create a simulation job](https://docs.aws.amazon.com/robomaker/latest/dg/create-simulation-job.html) in RoboMaker.
 
 ### Interacting with this sample in RoboMaker
 
-As the RoboMaker simulator doesn't support audio input or output you'll have to use the `audio_input.py` and `text_input.py` 
+As the RoboMaker simulator doesn't support audio input or output you'll have to use the `audio_input.py` and `text_input.py`
 scripts to move the robot around. First, open a RoboMaker terminal from the simulation job page, then run the commands below:
 
 ```bash
@@ -275,9 +275,9 @@ ros2 run voice_interaction_robot audio_input.py
 - RoboMaker-Lex-ROS1
 - RoboMaker-TTS-ROS1
 
-## ROS Nodes launched by this Sample 
+## ROS Nodes launched by this Sample
 
-### Nodes created by dependent packages 
+### Nodes created by dependent packages
 
 ```
 /lex_node
@@ -317,10 +317,8 @@ ros2 run voice_interaction_robot audio_input.py
 
 ## License
 
-MIT-0 - See LICENSE.txt for further information
+MIT-0 - See LICENSE for further information
 
 ## How to Contribute
 
 Create issues and pull requests against this repository on Github
-
-
