@@ -16,14 +16,18 @@
  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-import rospy
 import time
+import rospy
+from rospy.exceptions import ROSException
+
 from std_msgs.msg import String
 from lex_common_msgs.srv import AudioTextConversation
 from audio_common_msgs.msg import AudioData
 from voice_interaction_robot_msgs.msg import FulfilledVoiceCommand
 
-lex_service = rospy.ServiceProxy("/lex_node/lex_conversation", AudioTextConversation)
+
+lex_service_name = "/lex_node/lex_conversation"
+lex_service = rospy.ServiceProxy(lex_service_name, AudioTextConversation)
 use_polly = rospy.get_param("/voice_interaction/use_polly")
 
 """
@@ -78,6 +82,12 @@ class VoiceInteraction:
         user_input = request.data
         rospy.loginfo("Received text input {}".format(user_input))
         empty_audio_request = AudioData(data='')
+        while True:
+            try:
+                rospy.wait_for_service(lex_service_name, 1.0)
+                break
+            except ROSException:
+                rospy.loginfo("service not available, waiting again...")
         lex_response = lex_service(content_type='text/plain; charset=utf-8',
                                    accept_type='text/plain; charset=utf-8',
                                    text_request=user_input,
@@ -92,6 +102,12 @@ class VoiceInteraction:
         accept_type = 'text/plain; charset=utf-8'
         if use_polly:
             accept_type = 'audio/pcm'
+        while True:
+            try:
+                rospy.wait_for_service(lex_service_name, 1.0)
+                break
+            except ROSException:
+                rospy.loginfo("service not available, waiting again...")
         lex_response = lex_service(content_type='audio/x-l16; sample-rate=16000; channel-count=1',
                                    accept_type=accept_type,
                                    text_request=None,
